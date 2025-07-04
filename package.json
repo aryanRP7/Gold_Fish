@@ -10,7 +10,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "tone": "^15.1.22"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -35,5 +35,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "ajv": "^7.2.4",
+    "web-vitals": "^5.0.3"
   }
 }

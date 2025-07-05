@@ -4,6 +4,16 @@ import './MusicVisualizer.css';
 
 const emojis = ['😄', '🌻', '😍', '🥰', '😘', '💌', '💞', '❤️', '💛', '💚', '💙', '💜', '🦚', '🍿', '🧋'];
 
+const formatTime = (time) => {
+  const minutes = Math.floor(time / 60)
+    .toString()
+    .padStart(2, '0');
+  const seconds = Math.floor(time % 60)
+    .toString()
+    .padStart(2, '0');
+  return `${minutes}:${seconds}`;
+};
+
 const MusicVisualizer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [emojiElements, setEmojiElements] = useState([]);
@@ -78,7 +88,6 @@ const MusicVisualizer = () => {
     };
   }, [isDragging]);
 
-  // Dragging logic
   const getSeekTime = (e) => {
     const rect = progressRef.current.getBoundingClientRect();
     const x = e.touches ? e.touches[0].clientX : e.clientX;
@@ -187,21 +196,27 @@ const MusicVisualizer = () => {
       </button>
 
       {isPlaying && (
-        <div
-          className="progress-container"
-          ref={progressRef}
-          onMouseDown={handleDragStart}
-          onMouseMove={handleDragging}
-          onMouseUp={handleDragEnd}
-          onTouchStart={handleDragStart}
-          onTouchMove={handleDragging}
-          onTouchEnd={handleDragEnd}
-        >
+        <>
           <div
-            className="progress-bar"
-            style={{ width: `${(currentTime / duration) * 100}%` }}
-          />
-        </div>
+            className="progress-container"
+            ref={progressRef}
+            onMouseDown={handleDragStart}
+            onMouseMove={handleDragging}
+            onMouseUp={handleDragEnd}
+            onTouchStart={handleDragStart}
+            onTouchMove={handleDragging}
+            onTouchEnd={handleDragEnd}
+          >
+            <div
+              className="progress-bar"
+              style={{ width: `${(currentTime / duration) * 100}%` }}
+            />
+          </div>
+          <div className="time-info">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+        </>
       )}
     </div>
   );

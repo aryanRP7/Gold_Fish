@@ -1,34 +1,39 @@
+/* Container */
 .container {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
     position: relative;
     font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   
-  /* Button */
+  /* Music Button */
   .music-button {
     font-size: 3rem;
     border: none;
-    background: transparent; /* Removes the circle background */
+    background: transparent;
     cursor: pointer;
     z-index: 10;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* Adds shadow */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     padding: 0.5rem;
-    border-radius: 50%; /* Optional: keep for button shape */
-    color: white; /* Optional: adjust based on your background */
+    border-radius: 50%;
+    color: wite;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
   
   .music-button:hover {
     transform: translate(-50%, -50%) scale(1.1);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+
   }
-  
   
   /* Emoji Wall Background */
   .emoji-wall {
@@ -47,7 +52,7 @@
     }
   }
   
-  /* Overlay sparkles on emoji wall */
+  /* Sparkle Overlay */
   .emoji-wall::after {
     content: '';
     position: absolute;
@@ -88,7 +93,7 @@
     }
   }
   
-  /* Canvas (stars) */
+  /* Star Canvas */
   .star-canvas {
     position: absolute;
     top: 0;
@@ -99,7 +104,7 @@
     background: radial-gradient(ellipse at center, #000000 0%, #0d0d0d 100%);
   }
   
-  /* Progress bar */
+  /* Progress Container */
   .progress-container {
     position: absolute;
     top: calc(50% + 3.5rem);
@@ -109,19 +114,18 @@
     height: 6px;
     background-color: rgba(255, 255, 255, 0.15);
     border-radius: 3px;
-    cursor: pointer;
     z-index: 10;
     opacity: 0.5;
     transition: opacity 0.3s ease;
-    touch-action: none; /* Prevents accidental scroll while dragging on mobile */
+    touch-action: none;
     cursor: pointer;
-
   }
   
   .progress-container:hover {
     opacity: 1;
   }
   
+  /* Progress Bar */
   .progress-bar {
     height: 100%;
     background-color: #fff;

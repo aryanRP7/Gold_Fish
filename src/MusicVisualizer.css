@@ -19,18 +19,55 @@
   font-size: 3rem;
   padding: 0.5rem;
   border: none;
-  background-color: rgba(255, 255, 255, 0.08); /* faint whitish */
-  backdrop-filter: blur(4px);                 /* optional soft blur */
-  border-radius: 50%;
-  color: white;
+  background: none;
+  color: rgba(240, 240, 240, 0.35); /* blackish-white with transparency */
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.08); /* soft glow */
 }
 .music-button:hover {
   transform: translate(-50%, -50%) scale(1.1);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.6); /* lighten on hover */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
+.music-button:active {
+  transform: translate(-50%, -50%) scale(0.95);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
+}
+
+
+
+/* Skip Buttons */
+/* .skip-button {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  padding: 0.5rem;
+  border: none;
+  background: none;
+  color: rgba(240, 240, 240, 0.35);
+  cursor: pointer;
+  z-index: 10;
+  transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
+}
+.skip-button:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+.skip-button:active {
+  transform: translate(-50%, -50%) scale(0.95);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
+}
+
+.skip-button.prev {
+  left: calc(50% - 6rem);
+}
+.skip-button.next {
+  left: calc(50% + 6rem);
+} */
 
 /* Emoji‑Wall Background + Sparkle */
 .emoji-wall {
@@ -103,35 +140,14 @@
 }
 .progress-bar {
   height: 100%;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 3px;
   transition: width 0.2s ease;
 }
 
-/* Skip Buttons */
-.skip-button {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 2rem;
-  padding: 0.5rem;
-  border: none;
-  background: transparent;
-  color: white;
-  cursor: pointer;
-  z-index: 10;
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-.skip-button:hover {
-  transform: translate(-50%, -50%) scale(1.1);
-  color: #ffd700;
-}
-.skip-button.prev {
-  left: calc(50% - 6rem);
-}
-.skip-button.next {
-  left: calc(50% + 6rem);
-}
+
+
+
 
 /* Time Info */
 .time-info {
@@ -142,12 +158,12 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.7);
+   color: rgba(255, 255, 255, 0.6);
   z-index: 10;
 }
 
 /* Song Dropdown */
-.song-dropdown {
+/* .song-dropdown {
   position: absolute;
   top: calc(50% + 5.5rem);
   right: 20%;
@@ -165,9 +181,9 @@
 .song-dropdown select {
   background: black;
   border: none;
-  color: white;
+   color: rgba(255, 255, 255, 0.6);
   font-family: inherit;
   font-size: 0.9rem;
   outline: none;
   cursor: pointer;
-}
+} */

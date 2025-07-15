@@ -1,8 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { playlist } from './playlist';
+import { FaPlay } from "react-icons/fa";
+import { FaPause } from "react-icons/fa6";
+import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowBack } from "react-icons/io";
 import './MusicVisualizer.css';
 
-const emojis = ['😄', '🌻', '😍', '🥰', '😘', '✨', '💞', '🌻', '❤️', '😻', '💙', '🤩', '🦚','🌻', '🧋'];
+const emojis = ['😄', '🌻', '😍', '🥰', '😘', '✨', '💞', '🌻', '❤️', '😻', '💙', '🤩', '🦚', '🌻', '🧋'];
 
 const formatTime = (time) => {
   const minutes = Math.floor(time / 60).toString().padStart(2, '0');
@@ -51,6 +55,51 @@ const MusicVisualizer = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Initialize star positions
+  const initStars = useCallback(() => {
+    const w = window.innerWidth, h = window.innerHeight;
+    stars.current = Array.from({ length: 800 }, () => ({
+      x: (Math.random() - 0.5) * w,
+      y: (Math.random() - 0.5) * h,
+      z: Math.random() * w,
+    }));
+  }, []);
+
+  // Draw starfield
+  const drawStars = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = (canvas.width = window.innerWidth);
+    const h = (canvas.height = window.innerHeight);
+    const cx = w / 2, cy = h / 2;
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+
+    for (const star of stars.current) {
+      star.z -= 2;
+      if (star.z <= 0) {
+        star.z = w;
+        star.x = (Math.random() - 0.5) * w;
+        star.y = (Math.random() - 0.5) * h;
+      }
+      const k = 128.0 / star.z;
+      const x = star.x * k + cx;
+      const y = star.y * k + cy;
+      const size = (1 - star.z / w) * 3;
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, size);
+      grad.addColorStop(0, 'white');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    animationRef.current = requestAnimationFrame(drawStars);
+  }, []);
+
   // Starfield when playing
   useEffect(() => {
     if (isPlaying) {
@@ -59,7 +108,7 @@ const MusicVisualizer = () => {
     } else {
       cancelAnimationFrame(animationRef.current);
     }
-  }, [isPlaying]);
+  }, [isPlaying, drawStars, initStars]);
 
   // Audio progress & auto-advance
   useEffect(() => {
@@ -121,51 +170,6 @@ const MusicVisualizer = () => {
     };
   }, []);
 
-  // Initialize star positions
-  const initStars = () => {
-    const w = window.innerWidth, h = window.innerHeight;
-    stars.current = Array.from({ length: 800 }, () => ({
-      x: (Math.random() - 0.5) * w,
-      y: (Math.random() - 0.5) * h,
-      z: Math.random() * w,
-    }));
-  };
-
-  // Draw starfield
-  const drawStars = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const w = (canvas.width = window.innerWidth);
-    const h = (canvas.height = window.innerHeight);
-    const cx = w / 2, cy = h / 2;
-
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, w, h);
-
-    for (const star of stars.current) {
-      star.z -= 2;
-      if (star.z <= 0) {
-        star.z = w;
-        star.x = (Math.random() - 0.5) * w;
-        star.y = (Math.random() - 0.5) * h;
-      }
-      const k = 128.0 / star.z;
-      const x = star.x * k + cx;
-      const y = star.y * k + cy;
-      const size = (1 - star.z / w) * 3;
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, size);
-      grad.addColorStop(0, 'white');
-      grad.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    animationRef.current = requestAnimationFrame(drawStars);
-  };
-
   // Play/pause toggle
   const handleToggle = () => {
     const audio = audioRef.current;
@@ -191,7 +195,7 @@ const MusicVisualizer = () => {
     setIsPlaying(true);
   };
 
-  // ⌨️ Spacebar handler for play/pause only
+  // ⌨️ Spacebar handler
   useEffect(() => {
     const onKey = e => {
       if (e.code === 'Space' || e.key === ' ') {
@@ -215,13 +219,13 @@ const MusicVisualizer = () => {
 
       {/* Central Play/Pause */}
       <button className="music-button" onClick={handleToggle}>
-        {isPlaying ? '⏸️' : '▶️'}
+        {isPlaying ? <FaPause /> : <FaPlay />}
       </button>
 
       {isPlaying && (
         <>
           {/* Skip & Dropdown Controls */}
-          <button className="skip-button prev" onClick={handlePrev}>⏮️</button>
+          <button className="skip-button prev" onClick={handlePrev}><IoIosArrowBack /></button>
           <div className="song-dropdown">
             <select
               value={currentSongIndex}
@@ -234,7 +238,7 @@ const MusicVisualizer = () => {
               ))}
             </select>
           </div>
-          <button className="skip-button next" onClick={handleNext}>⏭️</button>
+          <button className="skip-button next" onClick={handleNext}><IoIosArrowForward /></button>
 
           {/* Progress Bar */}
           <div

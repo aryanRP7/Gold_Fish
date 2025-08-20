@@ -38,7 +38,7 @@
 
 
 /* Skip Buttons */
-/* .skip-button {
+.skip-button {
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -67,7 +67,7 @@
 }
 .skip-button.next {
   left: calc(50% + 6rem);
-} */
+}
 
 /* Emoji‑Wall Background + Sparkle */
 .emoji-wall {
@@ -163,7 +163,7 @@
 }
 
 /* Song Dropdown */
-/* .song-dropdown {
+.song-dropdown {
   position: absolute;
   top: calc(50% + 5.5rem);
   right: 20%;
@@ -186,4 +186,4 @@
   font-size: 0.9rem;
   outline: none;
   cursor: pointer;
-} */
+}

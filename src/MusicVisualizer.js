@@ -264,6 +264,11 @@ const MusicVisualizer = () => {
           </div>
         </>
       )}
+      <img
+        src="https://visitor-badge.glitch.me/badge?page_id=aryanRP7.Gold_Fish"
+        alt="visitor count"
+        style={{ position: 'absolute', bottom: '10px', right: '10px' }}
+      />
     </div>
   );
 };

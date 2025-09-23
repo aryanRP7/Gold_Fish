@@ -13,5 +13,5 @@ export const playlist = [
   { name: 'Raanjhanaa', src: song4 },
   { name: 'Toota Tara', src: song5 },
   { name: 'Mast Magan', src: song6 },
-  { name: 'K.K.', src: song6 },
+  { name: 'K.K.', src: song7 },
 ].sort((a, b) => a.name.localeCompare(b.name));

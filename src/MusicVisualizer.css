@@ -223,3 +223,29 @@
   outline: none;
   cursor: pointer;
 }
+
+
+/* 📱 Mobile (≤768px) */
+@media (max-width: 768px) {
+  .seek-controls {
+    top: calc(50% + 6rem);
+    gap: 1.5rem;
+  }
+
+  .song-dropdown {
+    top: calc(50% + 10.5rem); /* extra space for mobile */
+    right: 10%; /* closer to edge */
+  }
+}
+
+/* 📺 Tablet / iPad Pro (769px–1200px) */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .seek-controls {
+    top: calc(50% + 6rem);
+  }
+
+  .song-dropdown {
+    top: calc(50% + 10rem);
+    right: 15%; /* slightly inward */
+  }
+}

@@ -17,3 +17,4 @@ export const playlist = [
   { name: "K.K.", src: song7 },
   { name: "Arz", src: song8 },
 ];
+//Git website GoldFish - https://aryanrp7.github.io/Gold_Fish/

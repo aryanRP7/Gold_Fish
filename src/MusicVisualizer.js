@@ -1,16 +1,37 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { playlist } from './playlist';
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { playlist } from "./playlist";
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa6";
+import { TbRewindBackward10, TbRewindForward30 } from "react-icons/tb";
 import { IoIosArrowForward } from "react-icons/io";
 import { IoIosArrowBack } from "react-icons/io";
-import './MusicVisualizer.css';
+import "./MusicVisualizer.css";
 
-const emojis = ['😄', '🌻', '😍', '🥰', '😘', '✨', '💞', '🌻', '❤️', '😻', '💙', '🤩', '🦚', '🌻', '🧋'];
+const emojis = [
+  "😄",
+  "🌻",
+  "😍",
+  "🥰",
+  "😘",
+  "✨",
+  "💞",
+  "🌻",
+  "❤️",
+  "😻",
+  "💙",
+  "🤩",
+  "🦚",
+  "🌻",
+  "🧋",
+];
 
 const formatTime = (time) => {
-  const minutes = Math.floor(time / 60).toString().padStart(2, '0');
-  const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+  const minutes = Math.floor(time / 60)
+    .toString()
+    .padStart(2, "0");
+  const seconds = Math.floor(time % 60)
+    .toString()
+    .padStart(2, "0");
   return `${minutes}:${seconds}`;
 };
 
@@ -30,6 +51,18 @@ const MusicVisualizer = () => {
   const stars = useRef([]);
   const animationRef = useRef(null);
 
+  const handleRewind = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = Math.max(audio.currentTime - 10, 0);
+  };
+
+  const handleForward = () => {
+    const audio = audioRef.current;
+    if (!audio || isNaN(audio.duration)) return;
+    audio.currentTime = Math.min(audio.currentTime + 30, audio.duration);
+  };
+
   // Floating emojis
   useEffect(() => {
     const maxEmojis = 50;
@@ -44,7 +77,7 @@ const MusicVisualizer = () => {
         animationDelay: `${Math.random() * 2}s`,
       };
       const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-      setEmojiElements(prev => [
+      setEmojiElements((prev) => [
         ...prev,
         <span key={count} className="floating-emoji" style={style}>
           {emoji}
@@ -57,7 +90,8 @@ const MusicVisualizer = () => {
 
   // Initialize star positions
   const initStars = useCallback(() => {
-    const w = window.innerWidth, h = window.innerHeight;
+    const w = window.innerWidth,
+      h = window.innerHeight;
     stars.current = Array.from({ length: 800 }, () => ({
       x: (Math.random() - 0.5) * w,
       y: (Math.random() - 0.5) * h,
@@ -69,12 +103,13 @@ const MusicVisualizer = () => {
   const drawStars = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const w = (canvas.width = window.innerWidth);
     const h = (canvas.height = window.innerHeight);
-    const cx = w / 2, cy = h / 2;
+    const cx = w / 2,
+      cy = h / 2;
 
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, w, h);
 
     for (const star of stars.current) {
@@ -89,8 +124,8 @@ const MusicVisualizer = () => {
       const y = star.y * k + cy;
       const size = (1 - star.z / w) * 3;
       const grad = ctx.createRadialGradient(x, y, 0, x, y, size);
-      grad.addColorStop(0, 'white');
-      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      grad.addColorStop(0, "white");
+      grad.addColorStop(1, "rgba(255,255,255,0)");
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.arc(x, y, size, 0, Math.PI * 2);
@@ -127,33 +162,33 @@ const MusicVisualizer = () => {
       setIsPlaying(true);
     };
 
-    audio.addEventListener('timeupdate', updateProgress);
-    audio.addEventListener('loadedmetadata', updateProgress);
-    audio.addEventListener('ended', handleSongEnd);
+    audio.addEventListener("timeupdate", updateProgress);
+    audio.addEventListener("loadedmetadata", updateProgress);
+    audio.addEventListener("ended", handleSongEnd);
 
     return () => {
-      audio.removeEventListener('timeupdate', updateProgress);
-      audio.removeEventListener('loadedmetadata', updateProgress);
-      audio.removeEventListener('ended', handleSongEnd);
+      audio.removeEventListener("timeupdate", updateProgress);
+      audio.removeEventListener("loadedmetadata", updateProgress);
+      audio.removeEventListener("ended", handleSongEnd);
     };
   }, [isDragging, currentSongIndex]);
 
   // Drag-to-seek handlers
-  const getSeekTime = e => {
+  const getSeekTime = (e) => {
     const rect = progressRef.current.getBoundingClientRect();
     const x = e.touches ? e.touches[0].clientX : e.clientX;
     const pct = Math.min(Math.max((x - rect.left) / rect.width, 0), 1);
     return pct * duration;
   };
-  const handleDragStart = e => {
+  const handleDragStart = (e) => {
     setIsDragging(true);
     setCurrentTime(getSeekTime(e));
   };
-  const handleDragging = e => {
+  const handleDragging = (e) => {
     if (!isDragging) return;
     setCurrentTime(getSeekTime(e));
   };
-  const handleDragEnd = e => {
+  const handleDragEnd = (e) => {
     if (!isDragging) return;
     const t = getSeekTime(e);
     audioRef.current.currentTime = t;
@@ -162,11 +197,11 @@ const MusicVisualizer = () => {
   };
   useEffect(() => {
     const stop = () => setIsDragging(false);
-    window.addEventListener('mouseup', stop);
-    window.addEventListener('touchend', stop);
+    window.addEventListener("mouseup", stop);
+    window.addEventListener("touchend", stop);
     return () => {
-      window.removeEventListener('mouseup', stop);
-      window.removeEventListener('touchend', stop);
+      window.removeEventListener("mouseup", stop);
+      window.removeEventListener("touchend", stop);
     };
   }, []);
 
@@ -190,15 +225,15 @@ const MusicVisualizer = () => {
     setCurrentSongIndex(idx);
     setIsPlaying(true);
   };
-  const handleSongChange = idx => {
+  const handleSongChange = (idx) => {
     setCurrentSongIndex(idx);
     setIsPlaying(true);
   };
 
   // ⌨️ Spacebar handler
   useEffect(() => {
-    const onKey = e => {
-      if (e.code === 'Space' || e.key === ' ') {
+    const onKey = (e) => {
+      if (e.code === "Space" || e.key === " ") {
         e.preventDefault();
         const audio = audioRef.current;
         if (!audio) return;
@@ -207,12 +242,12 @@ const MusicVisualizer = () => {
         setIsPlaying(!audio.paused);
       }
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [isPlaying]);
 
   return (
-    <div className={`container ${isPlaying ? 'stars' : 'emoji-wall'}`}>
+    <div className={`container ${isPlaying ? "stars" : "emoji-wall"}`}>
       <audio ref={audioRef} src={currentSong.src} autoPlay={isPlaying} />
       {!isPlaying && <div className="emoji-layer">{emojiElements}</div>}
       {isPlaying && <canvas ref={canvasRef} className="star-canvas" />}
@@ -225,11 +260,13 @@ const MusicVisualizer = () => {
       {isPlaying && (
         <>
           {/* Skip & Dropdown Controls */}
-          <button className="skip-button prev" onClick={handlePrev}><IoIosArrowBack /></button>
+          <button className="skip-button prev" onClick={handlePrev}>
+            <IoIosArrowBack />
+          </button>
           <div className="song-dropdown">
             <select
               value={currentSongIndex}
-              onChange={e => handleSongChange(Number(e.target.value))}
+              onChange={(e) => handleSongChange(Number(e.target.value))}
             >
               {playlist.map((song, i) => (
                 <option key={i} value={i}>
@@ -238,7 +275,9 @@ const MusicVisualizer = () => {
               ))}
             </select>
           </div>
-          <button className="skip-button next" onClick={handleNext}><IoIosArrowForward /></button>
+          <button className="skip-button next" onClick={handleNext}>
+            <IoIosArrowForward />
+          </button>
 
           {/* Progress Bar */}
           <div
@@ -261,6 +300,30 @@ const MusicVisualizer = () => {
           <div className="time-info">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
+          </div>
+
+          {/* Rewind / Forward */}
+          <div className="seek-controls">
+            <button className="seek-button" onClick={handleRewind}>
+              <TbRewindBackward10 />
+            </button>
+            <button className="seek-button" onClick={handleForward}>
+              <TbRewindForward30 />
+            </button>
+          </div>
+
+          {/* Song Dropdown (moved below) */}
+          <div className="song-dropdown">
+            <select
+              value={currentSongIndex}
+              onChange={(e) => handleSongChange(Number(e.target.value))}
+            >
+              {playlist.map((song, i) => (
+                <option key={i} value={i}>
+                  {song.name}
+                </option>
+              ))}
+            </select>
           </div>
         </>
       )}

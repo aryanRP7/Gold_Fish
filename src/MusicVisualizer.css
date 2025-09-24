@@ -69,6 +69,42 @@
   left: calc(50% + 6rem);
 }
 
+/* Seek Controls */
+.seek-controls {
+  position: absolute;
+  top: calc(50% + 5.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2rem;
+  z-index: 10;
+}
+
+.seek-button {
+  font-size: 1.8rem;
+  border: none;
+  background: none;
+  color: rgba(240, 240, 240, 0.35);
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
+}
+.seek-button:hover {
+  transform: scale(1.1);
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+.seek-button:active {
+  transform: scale(0.95);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
+}
+
+/* Move dropdown further down */
+.song-dropdown {
+  top: calc(50% + 8rem);
+}
+
+
 /* Emoji‑Wall Background + Sparkle */
 .emoji-wall {
   background: linear-gradient(270deg, #1a101f, #331414, #2c1b0f, #0b0b0b, #2d0d3a, #150c14, #1a101f);

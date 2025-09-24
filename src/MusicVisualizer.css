@@ -99,11 +99,6 @@
   text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
 }
 
-/* Move dropdown further down */
-.song-dropdown {
-  top: calc(50% + 8rem);
-}
-
 
 /* Emoji‑Wall Background + Sparkle */
 .emoji-wall {

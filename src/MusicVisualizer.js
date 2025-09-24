@@ -263,18 +263,6 @@ const MusicVisualizer = () => {
           <button className="skip-button prev" onClick={handlePrev}>
             <IoIosArrowBack />
           </button>
-          <div className="song-dropdown">
-            <select
-              value={currentSongIndex}
-              onChange={(e) => handleSongChange(Number(e.target.value))}
-            >
-              {playlist.map((song, i) => (
-                <option key={i} value={i}>
-                  {song.name}
-                </option>
-              ))}
-            </select>
-          </div>
           <button className="skip-button next" onClick={handleNext}>
             <IoIosArrowForward />
           </button>

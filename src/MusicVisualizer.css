@@ -244,3 +244,90 @@
     right: 15%; /* slightly inward */
   }
 }
+/* Shuffle Button base */
+.shuffle-button {
+  position: absolute;
+  top: calc(50% + 5.5rem);        /* align with seek-controls vertical position */
+  left: calc(50% + 8rem);         /* place to the right of center (between center controls and right dropdown) */
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+
+.shuffle-icon {
+  font-size: 1.6rem;
+  border: none;
+  background: none;
+  color: rgba(240, 240, 240, 0.35);
+  cursor: pointer;
+  padding: 0.15rem;
+  border-radius: 6px;
+  transition: transform 0.18s ease, color 0.18s ease, text-shadow 0.18s ease;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.06);
+}
+.shuffle-icon:hover {
+  transform: scale(1.06);
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.12);
+}
+.shuffle-icon.active {
+  color: #fff; /* solid white when active */
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+}
+
+/* Mobile: place shuffle above dropdown and right-aligned */
+@media (max-width: 768px) {
+  .shuffle-button {
+    top: calc(50% + 9.5rem); /* slightly above the dropdown top */
+    right: 10%;
+    left: auto;
+    transform: translateY(-50%);
+  }
+
+  .song-dropdown {
+    top: calc(50% + 10.5rem); /* keep dropdown below shuffle */
+    right: 10%;
+  }
+}
+
+/* Tablet / iPad Pro: slightly different offsets but still between center and right dropdown */
+/* Mobile & iPad (<= 1200px): place shuffle above dropdown, right aligned */
+@media (max-width: 1200px) {
+  .shuffle-button {
+    top: calc(50% + 9.5rem); /* slightly above dropdown */
+    right: 10%;
+    left: auto;
+    transform: translateY(-50%);
+  }
+
+  .song-dropdown {
+    top: calc(50% + 10.5rem); /* keep dropdown below shuffle */
+    right: 10%;
+  }
+}
+
+/* iPad Pro only: 769px–1200px */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .shuffle-button {
+    top: calc(50% + 9.5rem);
+    right: 20%; /* align with progress bar right edge */
+    left: auto;
+  }
+
+  .song-dropdown {
+    top: calc(50% + 10.5rem);
+    right: 20%; /* align with progress bar right edge */
+  }
+}
+
+
+/* Desktop only (≥1201px) */
+@media (min-width: 1201px) {
+  .shuffle-button {
+    top: calc(50% + 6.5rem); /* lower by 1rem */
+  }
+}
+
+/* Desktop wide screens: use the default .shuffle-button placement (already above) */
+/* If you want to nudge it for ultra-wide, tweak left: calc(50% + Xpx) above */

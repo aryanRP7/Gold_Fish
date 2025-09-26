@@ -3,6 +3,7 @@ import { playlist } from "./playlist";
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa6";
 import { TbRewindBackward10, TbRewindForward30 } from "react-icons/tb";
+import { TbArrowsShuffle } from "react-icons/tb";
 import { IoIosArrowForward } from "react-icons/io";
 import { IoIosArrowBack } from "react-icons/io";
 import "./MusicVisualizer.css";
@@ -50,6 +51,9 @@ const MusicVisualizer = () => {
   const progressRef = useRef(null);
   const stars = useRef([]);
   const animationRef = useRef(null);
+
+  const [isShuffle, setIsShuffle] = useState(false);
+  const [shuffledQueue, setShuffledQueue] = useState([]);
 
   const handleRewind = () => {
     const audio = audioRef.current;
@@ -157,10 +161,36 @@ const MusicVisualizer = () => {
       }
     };
     const handleSongEnd = () => {
-      const nextIndex = (currentSongIndex + 1) % playlist.length;
+  if (isShuffle) {
+    if (shuffledQueue.length > 0) {
+      // Take next song from queue
+      const nextIndex = shuffledQueue[0];
+      setShuffledQueue((prev) => prev.slice(1));
       setCurrentSongIndex(nextIndex);
       setIsPlaying(true);
-    };
+    } else {
+      // 🔄 Regenerate full shuffle excluding current
+      const order = playlist.map((_, i) => i);
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+      }
+      const filteredOrder = order.filter((i) => i !== currentSongIndex);
+      setShuffledQueue(filteredOrder);
+
+      // Pick the first from the new shuffle
+      const nextIndex = filteredOrder[0];
+      setShuffledQueue((prev) => prev.slice(1));
+      setCurrentSongIndex(nextIndex);
+      setIsPlaying(true);
+    }
+  } else {
+    const nextIndex = (currentSongIndex + 1) % playlist.length;
+    setCurrentSongIndex(nextIndex);
+    setIsPlaying(true);
+  }
+};
+
 
     audio.addEventListener("timeupdate", updateProgress);
     audio.addEventListener("loadedmetadata", updateProgress);
@@ -172,6 +202,33 @@ const MusicVisualizer = () => {
       audio.removeEventListener("ended", handleSongEnd);
     };
   }, [isDragging, currentSongIndex]);
+
+  // shuffle toggle handler
+  // shuffle toggle handler
+const handleShuffleToggle = () => {
+  setIsShuffle((prev) => {
+    const newState = !prev;
+    if (newState) {
+      // create shuffled order of all songs
+      const order = playlist.map((_, i) => i);
+
+      // shuffle array (Fisher–Yates)
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+      }
+
+      // 🚨 remove the currently playing song
+      const filteredOrder = order.filter((i) => i !== currentSongIndex);
+
+      setShuffledQueue(filteredOrder);
+    } else {
+      setShuffledQueue([]);
+    }
+    return newState;
+  });
+};
+
 
   // Drag-to-seek handlers
   const getSeekTime = (e) => {
@@ -312,6 +369,15 @@ const MusicVisualizer = () => {
                 </option>
               ))}
             </select>
+          </div>
+          {/* Shuffle Button */}
+          <div className="shuffle-button">
+            <button
+              onClick={handleShuffleToggle}
+              className={`shuffle-icon ${isShuffle ? "active" : ""}`}
+            >
+              <TbArrowsShuffle />
+            </button>
           </div>
         </>
       )}

@@ -21,7 +21,7 @@ export const playlist = [
   { name: "Arz", src: song8 },
   { name: "Kahani", src: song9 },
   { name: "Mann", src: song10 },
-  { name: "Baat", src: song11 },
+  { name: "Itni Baat", src: song11 },
 ];
 //Git website GoldFish - https://aryanrp7.github.io/Gold_Fish/
 // 🦚

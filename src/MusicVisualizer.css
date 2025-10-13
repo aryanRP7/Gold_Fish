@@ -347,7 +347,6 @@
   .shuffle-icon:not(.active):hover,
   .shuffle-icon:not(.active):active {
     color: rgba(240, 240, 240, 0.35) !important;
-    transform: none !important;
     text-shadow: 0 0 4px rgba(255, 255, 255, 0.08) !important;
   }
 }

@@ -1,5 +1,4 @@
-/* Original css*/
-/* Container */
+/* === Container === */
 .container {
   width: 100vw;
   height: 100vh;
@@ -11,7 +10,7 @@
   align-items: center;
 }
 
-/* Music Button */
+/* === Music Button === */
 .music-button {
   position: absolute;
   top: 50%;
@@ -21,24 +20,18 @@
   padding: 0.5rem;
   border: none;
   background: none;
-  color: rgba(240, 240, 240, 0.35); /* blackish-white with transparency */
+  color: rgba(240, 240, 240, 0.35);
   cursor: pointer;
   transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
-  text-shadow: 0 0 4px rgba(255, 255, 255, 0.08); /* soft glow */
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
 }
 .music-button:hover {
   transform: translate(-50%, -50%) scale(1.1);
-  color: rgba(255, 255, 255, 0.6); /* lighten on hover */
+  color: rgba(255, 255, 255, 0.6);
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
-.music-button:active {
-  transform: translate(-50%, -50%) scale(0.95);
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
-}
 
-
-
-/* Skip Buttons */
+/* === Skip Buttons === */
 .skip-button {
   position: absolute;
   top: 50%;
@@ -53,24 +46,15 @@
   transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
   text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
 }
+.skip-button.prev { left: calc(50% - 6rem); }
+.skip-button.next { left: calc(50% + 6rem); }
 .skip-button:hover {
   transform: translate(-50%, -50%) scale(1.1);
   color: rgba(255, 255, 255, 0.6);
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
-.skip-button:active {
-  transform: translate(-50%, -50%) scale(0.95);
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
-}
 
-.skip-button.prev {
-  left: calc(50% - 6rem);
-}
-.skip-button.next {
-  left: calc(50% + 6rem);
-}
-
-/* Seek Controls */
+/* === Seek Controls === */
 .seek-controls {
   position: absolute;
   top: calc(50% + 5.5rem);
@@ -80,7 +64,6 @@
   gap: 2rem;
   z-index: 10;
 }
-
 .seek-button {
   font-size: 1.8rem;
   border: none;
@@ -95,13 +78,8 @@
   color: rgba(255, 255, 255, 0.6);
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
-.seek-button:active {
-  transform: scale(0.95);
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
-}
 
-
-/* Emoji‑Wall Background + Sparkle */
+/* === Emoji Wall Background === */
 .emoji-wall {
   background: linear-gradient(270deg, #1a101f, #331414, #2c1b0f, #0b0b0b, #2d0d3a, #150c14, #1a101f);
   background-size: 1200% 1200%;
@@ -124,7 +102,7 @@
   z-index: 1;
 }
 
-/* Floating Emojis */
+/* === Floating Emojis === */
 .emoji-layer {
   position: absolute;
   inset: 0;
@@ -144,7 +122,7 @@
   100% { transform: translateY(-100vh) scale(1.3); opacity: 0; }
 }
 
-/* Star Canvas */
+/* === Star Canvas === */
 .star-canvas {
   position: absolute;
   inset: 0;
@@ -152,7 +130,7 @@
   background: radial-gradient(ellipse at center, #000 0%, #0d0d0d 100%);
 }
 
-/* Progress Bar */
+/* === Progress Bar === */
 .progress-container {
   position: absolute;
   top: calc(50% + 3.5rem);
@@ -167,21 +145,20 @@
   opacity: 0.5;
   transition: opacity 0.3s ease;
 }
-.progress-container:hover {
-  opacity: 1;
-}
+.progress-container:hover { opacity: 1; }
 .progress-bar {
   height: 100%;
   background: rgba(255, 255, 255, 0.6);
   border-radius: 3px;
   transition: width 0.2s ease;
 }
+.progress-container.dragging .progress-bar {
+  background: linear-gradient(90deg, #fff, #9c6bff, #ff6bcb);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  transition: none;
+}
 
-
-
-
-
-/* Time Info */
+/* === Time Info === */
 .time-info {
   position: absolute;
   top: calc(50% + 4.5rem);
@@ -190,11 +167,11 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-   color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.6);
   z-index: 10;
 }
 
-/* Song Dropdown */
+/* === Song Dropdown === */
 .song-dropdown {
   position: absolute;
   top: calc(50% + 5.5rem);
@@ -207,54 +184,25 @@
   cursor: pointer;
   transition: background 0.3s ease;
 }
-.song-dropdown:hover {
-  background: rgba(255,255,255,0.1);
-}
+.song-dropdown:hover { background: rgba(255,255,255,0.1); }
 .song-dropdown select {
   background: black;
   border: none;
-   color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.6);
   font-family: inherit;
   font-size: 0.9rem;
   outline: none;
   cursor: pointer;
 }
 
-
-/* 📱 Mobile (≤768px) */
-@media (max-width: 768px) {
-  .seek-controls {
-    top: calc(50% + 6rem);
-    gap: 1.5rem;
-  }
-
-  .song-dropdown {
-    top: calc(50% + 10.5rem); /* extra space for mobile */
-    right: 10%; /* closer to edge */
-  }
-}
-
-/* 📺 Tablet / iPad Pro (769px–1200px) */
-@media (min-width: 769px) and (max-width: 1200px) {
-  .seek-controls {
-    top: calc(50% + 6rem);
-  }
-
-  .song-dropdown {
-    top: calc(50% + 10rem);
-    right: 15%; /* slightly inward */
-  }
-}
-/* Shuffle Button base */
+/* === Shuffle Button === */
 .shuffle-button {
   position: absolute;
-  top: calc(50% + 5.5rem);        /* align with seek-controls vertical position */
-  left: calc(50% + 8rem);         /* place to the right of center (between center controls and right dropdown) */
+  top: calc(50% + 5.5rem);
+  left: calc(50% + 8rem);
   transform: translateY(-50%);
   z-index: 10;
 }
-
-
 .shuffle-icon {
   font-size: 1.6rem;
   border: none;
@@ -266,69 +214,60 @@
   transition: transform 0.18s ease, color 0.18s ease, text-shadow 0.18s ease;
   text-shadow: 0 0 4px rgba(255, 255, 255, 0.06);
 }
+.shuffle-icon.active {
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+  animation: shufflePulse 0.4s ease;
+}
 .shuffle-icon:hover {
   transform: scale(1.06);
   color: rgba(255, 255, 255, 0.6);
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.12);
 }
-.shuffle-icon.active {
-  color: #fff; /* solid white when active */
-  font-weight: 700;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+@keyframes shufflePulse {
+  0% { transform: scale(1) rotate(0deg); }
+  40% { transform: scale(1.2) rotate(15deg); }
+  70% { transform: scale(0.95) rotate(-10deg); }
+  100% { transform: scale(1) rotate(0deg); }
 }
 
-/* Mobile: place shuffle above dropdown and right-aligned */
+/* === Temporary Active Flash === */
+/* Centered buttons (music/play) */
+.music-button:active {
+  animation: tempActiveCenter 1.5s forwards;
+}
+@keyframes tempActiveCenter {
+  0% { color: rgba(255,255,255,0.85); transform: translate(-50%, -50%) scale(0.95); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
+  100% { color: rgba(240,240,240,0.35); transform: translate(-50%, -50%) scale(1); text-shadow: 0 0 4px rgba(255,255,255,0.08); }
+}
+
+/* Absolute-positioned buttons (skip / seek) */
+.skip-button:active,
+.seek-button:active {
+  animation: tempActiveAbsolute 1.5s forwards;
+}
+@keyframes tempActiveAbsolute {
+  0% { color: rgba(255,255,255,0.85); transform: scale(0.95); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
+  100% { color: rgba(240,240,240,0.35); transform: scale(1); text-shadow: 0 0 4px rgba(255,255,255,0.08); }
+}
+
+/* === Responsive Mobile / Tablet Adjustments === */
+/* Mobile (iPhone) */
 @media (max-width: 768px) {
-  .shuffle-button {
-    top: calc(50% + 9.5rem); /* slightly above the dropdown top */
-    right: 10%;
-    left: auto;
-    transform: translateY(-50%);
-  }
-
-  .song-dropdown {
-    top: calc(50% + 10.5rem); /* keep dropdown below shuffle */
-    right: 10%;
-  }
+  .seek-controls { top: calc(50% + 6rem); gap: 1.5rem; }
+  .song-dropdown { top: calc(50% + 10.5rem); right: 10%; }
+  .shuffle-button { top: calc(50% + 9.5rem); right: 10%; left: auto; }
 }
 
-/* Tablet / iPad Pro: slightly different offsets but still between center and right dropdown */
-/* Mobile & iPad (<= 1200px): place shuffle above dropdown, right aligned */
-@media (max-width: 1200px) {
-  .shuffle-button {
-    top: calc(50% + 9.5rem); /* slightly above dropdown */
-    right: 10%;
-    left: auto;
-    transform: translateY(-50%);
-  }
-
-  .song-dropdown {
-    top: calc(50% + 10.5rem); /* keep dropdown below shuffle */
-    right: 10%;
-  }
-}
-
-/* iPad Pro only: 769px–1200px */
+/* iPad / Tablet */
 @media (min-width: 769px) and (max-width: 1200px) {
-  .shuffle-button {
-    top: calc(50% + 9.5rem);
-    right: 20%; /* align with progress bar right edge */
-    left: auto;
-  }
-
-  .song-dropdown {
-    top: calc(50% + 10.5rem);
-    right: 20%; /* align with progress bar right edge */
-  }
+  .seek-controls { top: calc(50% + 6rem); }
+  .song-dropdown { top: calc(50% + 10.5rem); right: 20%; }
+  .shuffle-button { top: calc(50% + 9.5rem); right: 20%; left: auto; }
 }
 
-
-/* Desktop only (≥1201px) */
+/* Desktop */
 @media (min-width: 1201px) {
-  .shuffle-button {
-    top: calc(50% + 6.5rem); /* lower by 1rem */
-  }
+  .shuffle-button { top: calc(50% + 6.5rem); }
 }
-
-/* Desktop wide screens: use the default .shuffle-button placement (already above) */
-/* If you want to nudge it for ultra-wide, tweak left: calc(50% + Xpx) above */

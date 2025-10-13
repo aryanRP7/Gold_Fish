@@ -312,53 +312,49 @@ const MusicVisualizer = () => {
 
   // handlePrev: respects history; if history exhausted -> traverse circularly
   const handlePrev = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  const audio = audioRef.current;
+  if (!audio) return;
 
-    // restart current song if more than 5 seconds played
-    if (audio.currentTime >= 5) {
-      audio.currentTime = 0;
-      return;
+  // ✅ 3-second rule: If current time > 3s, restart same song
+  if (audio.currentTime > 3) {
+    audio.currentTime = 0;
+    return;
+  }
+
+  const h = playHistory.current;
+  let p = historyPointer.current;
+
+  if (p > 0) {
+    // step back in history
+    navigatingHistory.current = true;
+    historyPointer.current = p - 1;
+    const prevIndex = h[historyPointer.current];
+    setCurrentSongIndex(prevIndex);
+    setIsPlaying(true);
+    setTimeout(() => (navigatingHistory.current = false), 0);
+
+    // keep shuffle pointer synced if active
+    if (isShuffle && shuffleOrder.current) {
+      const pos = shuffleOrder.current.indexOf(prevIndex);
+      if (pos !== -1) shufflePtr.current = pos;
     }
+  } else {
+    // history exhausted -> circular traversal
+    navigatingHistory.current = false;
 
-    const h = playHistory.current;
-    let p = historyPointer.current;
-
-    if (p > 0) {
-      // step back in history
-      navigatingHistory.current = true;
-      historyPointer.current = p - 1;
-      const prevIndex = h[historyPointer.current];
-      setCurrentSongIndex(prevIndex);
+    if (isShuffle && shuffleOrder.current && Array.isArray(shuffleOrder.current)) {
+      shufflePtr.current = (shufflePtr.current - 1 + shuffleOrder.current.length) % shuffleOrder.current.length;
+      const prevIdx = shuffleOrder.current[shufflePtr.current];
+      setCurrentSongIndex(prevIdx);
       setIsPlaying(true);
-      setTimeout(() => (navigatingHistory.current = false), 0);
-
-      // If shuffle is active, keep shuffleOrder in sync:
-      if (isShuffle && shuffleOrder.current) {
-        const pos = shuffleOrder.current.indexOf(prevIndex);
-        if (pos !== -1) shufflePtr.current = pos;
-      }
     } else {
-      // history exhausted -> traverse circularly (shuffle-aware)
-      navigatingHistory.current = false;
-
-      if (isShuffle && shuffleOrder.current && Array.isArray(shuffleOrder.current)) {
-        // move pointer backward circularly inside shuffleOrder
-        shufflePtr.current = (shufflePtr.current - 1 + shuffleOrder.current.length) % shuffleOrder.current.length;
-        const prevIdx = shuffleOrder.current[shufflePtr.current];
-        setCurrentSongIndex(prevIdx);
-        setIsPlaying(true);
-        // Do NOT pushToHistory here; we're doing circular traversal
-      } else {
-        // non-shuffle circular traversal of playlist (existing behavior)
-        // compute previous index circularly
-        const prevIdx = (currentSongIndex - 1 + playlist.length) % playlist.length;
-        setCurrentSongIndex(prevIdx);
-        setIsPlaying(true);
-        // Not pushing to history to preserve backward traversal semantics
-      }
+      const prevIdx = (currentSongIndex - 1 + playlist.length) % playlist.length;
+      setCurrentSongIndex(prevIdx);
+      setIsPlaying(true);
     }
-  };
+  }
+};
+
 
   const handleSongChange = (idx) => {
     navigatingHistory.current = false;

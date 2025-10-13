@@ -331,3 +331,23 @@
 
 /* Desktop wide screens: use the default .shuffle-button placement (already above) */
 /* If you want to nudge it for ultra-wide, tweak left: calc(50% + Xpx) above */
+/* 🔥 Flash tap effect for buttons */
+.btn-flash {
+  filter: brightness(2);
+  text-shadow: 0 0 12px rgba(255,255,255,0.6);
+  transition: filter 0.3s ease, text-shadow 0.3s ease;
+}
+@media (hover: none) {
+  .music-button:hover,
+  .music-button:active,
+  .skip-button:hover,
+  .skip-button:active,
+  .seek-button:hover,
+  .seek-button:active,
+  .shuffle-icon:not(.active):hover,
+  .shuffle-icon:not(.active):active {
+    color: rgba(240, 240, 240, 0.35) !important;
+    transform: none !important;
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.08) !important;
+  }
+}

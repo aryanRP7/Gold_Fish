@@ -1,29 +1,402 @@
+// import React, { useState, useRef, useEffect, useCallback } from "react";
+// import { playlist } from "./playlist";
+// import { FaPlay } from "react-icons/fa";
+// import { FaPause } from "react-icons/fa6";
+// import { TbRewindBackward10, TbRewindForward30 } from "react-icons/tb";
+// import { TbArrowsShuffle } from "react-icons/tb";
+// import { IoIosArrowForward } from "react-icons/io";
+// import { IoIosArrowBack } from "react-icons/io";
+// import "./MusicVisualizer.css";
+
+// const emojis = [
+//   "😄",
+//   "🌻",
+//   "😍",
+//   "🥰",
+//   "😘",
+//   "✨",
+//   "💞",
+//   "🌻",
+//   "❤️",
+//   "😻",
+//   "💙",
+//   "🤩",
+//   "🦚",
+//   "🌻",
+//   "🧋",
+// ];
+
+// const formatTime = (time) => {
+//   const minutes = Math.floor(time / 60)
+//     .toString()
+//     .padStart(2, "0");
+//   const seconds = Math.floor(time % 60)
+//     .toString()
+//     .padStart(2, "0");
+//   return `${minutes}:${seconds}`;
+// };
+
+// const MusicVisualizer = () => {
+//   const [isPlaying, setIsPlaying] = useState(false);
+//   const [emojiElements, setEmojiElements] = useState([]);
+//   const [currentTime, setCurrentTime] = useState(0);
+//   const [duration, setDuration] = useState(0);
+//   const [isDragging, setIsDragging] = useState(false);
+//   const [currentSongIndex, setCurrentSongIndex] = useState(0);
+
+//   const currentSong = playlist[currentSongIndex];
+
+//   const audioRef = useRef(null);
+//   const canvasRef = useRef(null);
+//   const progressRef = useRef(null);
+//   const stars = useRef([]);
+//   const animationRef = useRef(null);
+
+//   const [isShuffle, setIsShuffle] = useState(false);
+//   const [shuffledQueue, setShuffledQueue] = useState([]);
+
+//   const handleRewind = () => {
+//     const audio = audioRef.current;
+//     if (!audio) return;
+//     audio.currentTime = Math.max(audio.currentTime - 10, 0);
+//   };
+
+//   const handleForward = () => {
+//     const audio = audioRef.current;
+//     if (!audio || isNaN(audio.duration)) return;
+//     audio.currentTime = Math.min(audio.currentTime + 30, audio.duration);
+//   };
+
+//   // Floating emojis
+//   useEffect(() => {
+//     const maxEmojis = 50;
+//     let count = 0;
+//     const interval = setInterval(() => {
+//       if (count >= maxEmojis) return clearInterval(interval);
+//       const style = {
+//         left: `${Math.random() * 100}%`,
+//         top: `${Math.random() * 100}%`,
+//         fontSize: `${Math.random() * 2 + 1.2}rem`,
+//         animationDuration: `${Math.random() * 15 + 10}s`,
+//         animationDelay: `${Math.random() * 2}s`,
+//       };
+//       const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+//       setEmojiElements((prev) => [
+//         ...prev,
+//         <span key={count} className="floating-emoji" style={style}>
+//           {emoji}
+//         </span>,
+//       ]);
+//       count++;
+//     }, 250);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   // Initialize star positions
+//   const initStars = useCallback(() => {
+//     const w = window.innerWidth,
+//       h = window.innerHeight;
+//     stars.current = Array.from({ length: 800 }, () => ({
+//       x: (Math.random() - 0.5) * w,
+//       y: (Math.random() - 0.5) * h,
+//       z: Math.random() * w,
+//     }));
+//   }, []);
+
+//   // Draw starfield
+//   const drawStars = useCallback(() => {
+//     const canvas = canvasRef.current;
+//     if (!canvas) return;
+//     const ctx = canvas.getContext("2d");
+//     const w = (canvas.width = window.innerWidth);
+//     const h = (canvas.height = window.innerHeight);
+//     const cx = w / 2,
+//       cy = h / 2;
+
+//     ctx.fillStyle = "#000";
+//     ctx.fillRect(0, 0, w, h);
+
+//     for (const star of stars.current) {
+//       star.z -= 2;
+//       if (star.z <= 0) {
+//         star.z = w;
+//         star.x = (Math.random() - 0.5) * w;
+//         star.y = (Math.random() - 0.5) * h;
+//       }
+//       const k = 128.0 / star.z;
+//       const x = star.x * k + cx;
+//       const y = star.y * k + cy;
+//       const size = (1 - star.z / w) * 3;
+//       const grad = ctx.createRadialGradient(x, y, 0, x, y, size);
+//       grad.addColorStop(0, "white");
+//       grad.addColorStop(1, "rgba(255,255,255,0)");
+//       ctx.fillStyle = grad;
+//       ctx.beginPath();
+//       ctx.arc(x, y, size, 0, Math.PI * 2);
+//       ctx.fill();
+//     }
+
+//     animationRef.current = requestAnimationFrame(drawStars);
+//   }, []);
+
+//   // Starfield when playing
+//   useEffect(() => {
+//     if (isPlaying) {
+//       initStars();
+//       drawStars();
+//     } else {
+//       cancelAnimationFrame(animationRef.current);
+//     }
+//   }, [isPlaying, drawStars, initStars]);
+
+//   // Audio progress & auto-advance
+//   useEffect(() => {
+//     const audio = audioRef.current;
+//     if (!audio) return;
+
+//     const updateProgress = () => {
+//       if (!isDragging) {
+//         setCurrentTime(audio.currentTime);
+//         setDuration(audio.duration || 0);
+//       }
+//     };
+//     const handleSongEnd = () => {
+//   if (isShuffle) {
+//     if (shuffledQueue.length > 0) {
+//       // Take next song from queue
+//       const nextIndex = shuffledQueue[0];
+//       setShuffledQueue((prev) => prev.slice(1));
+//       setCurrentSongIndex(nextIndex);
+//       setIsPlaying(true);
+//     } else {
+//       // 🔄 Regenerate full shuffle excluding current
+//       const order = playlist.map((_, i) => i);
+//       for (let i = order.length - 1; i > 0; i--) {
+//         const j = Math.floor(Math.random() * (i + 1));
+//         [order[i], order[j]] = [order[j], order[i]];
+//       }
+//       const filteredOrder = order.filter((i) => i !== currentSongIndex);
+//       setShuffledQueue(filteredOrder);
+
+//       // Pick the first from the new shuffle
+//       const nextIndex = filteredOrder[0];
+//       setShuffledQueue((prev) => prev.slice(1));
+//       setCurrentSongIndex(nextIndex);
+//       setIsPlaying(true);
+//     }
+//   } else {
+//     const nextIndex = (currentSongIndex + 1) % playlist.length;
+//     setCurrentSongIndex(nextIndex);
+//     setIsPlaying(true);
+//   }
+// };
+
+
+//     audio.addEventListener("timeupdate", updateProgress);
+//     audio.addEventListener("loadedmetadata", updateProgress);
+//     audio.addEventListener("ended", handleSongEnd);
+
+//     return () => {
+//       audio.removeEventListener("timeupdate", updateProgress);
+//       audio.removeEventListener("loadedmetadata", updateProgress);
+//       audio.removeEventListener("ended", handleSongEnd);
+//     };
+//   }, [isDragging, currentSongIndex]);
+
+//   // shuffle toggle handler
+//   // shuffle toggle handler
+// const handleShuffleToggle = () => {
+//   setIsShuffle((prev) => {
+//     const newState = !prev;
+//     if (newState) {
+//       // create shuffled order of all songs
+//       const order = playlist.map((_, i) => i);
+
+//       // shuffle array (Fisher–Yates)
+//       for (let i = order.length - 1; i > 0; i--) {
+//         const j = Math.floor(Math.random() * (i + 1));
+//         [order[i], order[j]] = [order[j], order[i]];
+//       }
+
+//       // 🚨 remove the currently playing song
+//       const filteredOrder = order.filter((i) => i !== currentSongIndex);
+
+//       setShuffledQueue(filteredOrder);
+//     } else {
+//       setShuffledQueue([]);
+//     }
+//     return newState;
+//   });
+// };
+
+
+//   // Drag-to-seek handlers
+//   const getSeekTime = (e) => {
+//     const rect = progressRef.current.getBoundingClientRect();
+//     const x = e.touches ? e.touches[0].clientX : e.clientX;
+//     const pct = Math.min(Math.max((x - rect.left) / rect.width, 0), 1);
+//     return pct * duration;
+//   };
+//   const handleDragStart = (e) => {
+//     setIsDragging(true);
+//     setCurrentTime(getSeekTime(e));
+//   };
+//   const handleDragging = (e) => {
+//     if (!isDragging) return;
+//     setCurrentTime(getSeekTime(e));
+//   };
+//   const handleDragEnd = (e) => {
+//     if (!isDragging) return;
+//     const t = getSeekTime(e);
+//     audioRef.current.currentTime = t;
+//     setCurrentTime(t);
+//     setIsDragging(false);
+//   };
+//   useEffect(() => {
+//     const stop = () => setIsDragging(false);
+//     window.addEventListener("mouseup", stop);
+//     window.addEventListener("touchend", stop);
+//     return () => {
+//       window.removeEventListener("mouseup", stop);
+//       window.removeEventListener("touchend", stop);
+//     };
+//   }, []);
+
+//   // Play/pause toggle
+//   const handleToggle = () => {
+//     const audio = audioRef.current;
+//     if (!audio) return;
+//     if (isPlaying) audio.pause();
+//     else audio.play();
+//     setIsPlaying(!isPlaying);
+//   };
+
+//   // Prev / Next / Song change
+//   const handlePrev = () => {
+//     const idx = (currentSongIndex - 1 + playlist.length) % playlist.length;
+//     setCurrentSongIndex(idx);
+//     setIsPlaying(true);
+//   };
+//   const handleNext = () => {
+//     const idx = (currentSongIndex + 1) % playlist.length;
+//     setCurrentSongIndex(idx);
+//     setIsPlaying(true);
+//   };
+//   const handleSongChange = (idx) => {
+//     setCurrentSongIndex(idx);
+//     setIsPlaying(true);
+//   };
+
+//   // ⌨️ Spacebar handler
+//   useEffect(() => {
+//     const onKey = (e) => {
+//       if (e.code === "Space" || e.key === " ") {
+//         e.preventDefault();
+//         const audio = audioRef.current;
+//         if (!audio) return;
+//         if (audio.paused) audio.play();
+//         else audio.pause();
+//         setIsPlaying(!audio.paused);
+//       }
+//     };
+//     window.addEventListener("keydown", onKey);
+//     return () => window.removeEventListener("keydown", onKey);
+//   }, [isPlaying]);
+
+//   return (
+//     <div className={`container ${isPlaying ? "stars" : "emoji-wall"}`}>
+//       <audio ref={audioRef} src={currentSong.src} autoPlay={isPlaying} />
+//       {!isPlaying && <div className="emoji-layer">{emojiElements}</div>}
+//       {isPlaying && <canvas ref={canvasRef} className="star-canvas" />}
+
+//       {/* Central Play/Pause */}
+//       <button className="music-button" onClick={handleToggle}>
+//         {isPlaying ? <FaPause /> : <FaPlay />}
+//       </button>
+
+//       {isPlaying && (
+//         <>
+//           {/* Skip & Dropdown Controls */}
+//           <button className="skip-button prev" onClick={handlePrev}>
+//             <IoIosArrowBack />
+//           </button>
+//           <button className="skip-button next" onClick={handleNext}>
+//             <IoIosArrowForward />
+//           </button>
+
+//           {/* Progress Bar */}
+//           <div
+//             className="progress-container"
+//             ref={progressRef}
+//             onMouseDown={handleDragStart}
+//             onMouseMove={handleDragging}
+//             onMouseUp={handleDragEnd}
+//             onTouchStart={handleDragStart}
+//             onTouchMove={handleDragging}
+//             onTouchEnd={handleDragEnd}
+//           >
+//             <div
+//               className="progress-bar"
+//               style={{ width: `${(currentTime / duration) * 100}%` }}
+//             />
+//           </div>
+
+//           {/* Time & Duration */}
+//           <div className="time-info">
+//             <span>{formatTime(currentTime)}</span>
+//             <span>{formatTime(duration)}</span>
+//           </div>
+
+//           {/* Rewind / Forward */}
+//           <div className="seek-controls">
+//             <button className="seek-button" onClick={handleRewind}>
+//               <TbRewindBackward10 />
+//             </button>
+//             <button className="seek-button" onClick={handleForward}>
+//               <TbRewindForward30 />
+//             </button>
+//           </div>
+
+//           {/* Song Dropdown (moved below) */}
+//           <div className="song-dropdown">
+//             <select
+//               value={currentSongIndex}
+//               onChange={(e) => handleSongChange(Number(e.target.value))}
+//             >
+//               {playlist.map((song, i) => (
+//                 <option key={i} value={i}>
+//                   {song.name}
+//                 </option>
+//               ))}
+//             </select>
+//           </div>
+//           {/* Shuffle Button */}
+//           <div className="shuffle-button">
+//             <button
+//               onClick={handleShuffleToggle}
+//               className={`shuffle-icon ${isShuffle ? "active" : ""}`}
+//             >
+//               <TbArrowsShuffle />
+//             </button>
+//           </div>
+//         </>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default MusicVisualizer;
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { playlist } from "./playlist";
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa6";
-import { TbRewindBackward10, TbRewindForward30 } from "react-icons/tb";
-import { TbArrowsShuffle } from "react-icons/tb";
-import { IoIosArrowForward } from "react-icons/io";
-import { IoIosArrowBack } from "react-icons/io";
+import { TbRewindBackward10, TbRewindForward30, TbArrowsShuffle } from "react-icons/tb";
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import "./MusicVisualizer.css";
 
 const emojis = [
-  "😄",
-  "🌻",
-  "😍",
-  "🥰",
-  "😘",
-  "✨",
-  "💞",
-  "🌻",
-  "❤️",
-  "😻",
-  "💙",
-  "🤩",
-  "🦚",
-  "🌻",
-  "🧋",
+  "😄", "🌻", "😍", "🥰", "😘", "✨", "💞", "🌻",
+  "❤️", "😻", "💙", "🤩", "🦚", "🌻", "🧋",
 ];
 
 const formatTime = (time) => {
@@ -55,12 +428,12 @@ const MusicVisualizer = () => {
   const [isShuffle, setIsShuffle] = useState(false);
   const [shuffledQueue, setShuffledQueue] = useState([]);
 
+  // Rewind / Forward
   const handleRewind = () => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.currentTime = Math.max(audio.currentTime - 10, 0);
   };
-
   const handleForward = () => {
     const audio = audioRef.current;
     if (!audio || isNaN(audio.duration)) return;
@@ -92,26 +465,22 @@ const MusicVisualizer = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Initialize star positions
+  // Starfield
   const initStars = useCallback(() => {
-    const w = window.innerWidth,
-      h = window.innerHeight;
+    const w = window.innerWidth, h = window.innerHeight;
     stars.current = Array.from({ length: 800 }, () => ({
       x: (Math.random() - 0.5) * w,
       y: (Math.random() - 0.5) * h,
       z: Math.random() * w,
     }));
   }, []);
-
-  // Draw starfield
   const drawStars = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const w = (canvas.width = window.innerWidth);
     const h = (canvas.height = window.innerHeight);
-    const cx = w / 2,
-      cy = h / 2;
+    const cx = w / 2, cy = h / 2;
 
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, w, h);
@@ -139,7 +508,6 @@ const MusicVisualizer = () => {
     animationRef.current = requestAnimationFrame(drawStars);
   }, []);
 
-  // Starfield when playing
   useEffect(() => {
     if (isPlaying) {
       initStars();
@@ -160,37 +528,33 @@ const MusicVisualizer = () => {
         setDuration(audio.duration || 0);
       }
     };
+
     const handleSongEnd = () => {
-  if (isShuffle) {
-    if (shuffledQueue.length > 0) {
-      // Take next song from queue
-      const nextIndex = shuffledQueue[0];
-      setShuffledQueue((prev) => prev.slice(1));
-      setCurrentSongIndex(nextIndex);
-      setIsPlaying(true);
-    } else {
-      // 🔄 Regenerate full shuffle excluding current
-      const order = playlist.map((_, i) => i);
-      for (let i = order.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [order[i], order[j]] = [order[j], order[i]];
+      if (isShuffle) {
+        if (shuffledQueue.length > 0) {
+          const nextIndex = shuffledQueue[0];
+          setShuffledQueue((prev) => prev.slice(1));
+          setCurrentSongIndex(nextIndex);
+          setIsPlaying(true);
+        } else {
+          const order = playlist.map((_, i) => i);
+          for (let i = order.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [order[i], order[j]] = [order[j], order[i]];
+          }
+          const filteredOrder = order.filter((i) => i !== currentSongIndex);
+          setShuffledQueue(filteredOrder);
+          const nextIndex = filteredOrder[0];
+          setShuffledQueue((prev) => prev.slice(1));
+          setCurrentSongIndex(nextIndex);
+          setIsPlaying(true);
+        }
+      } else {
+        const nextIndex = (currentSongIndex + 1) % playlist.length;
+        setCurrentSongIndex(nextIndex);
+        setIsPlaying(true);
       }
-      const filteredOrder = order.filter((i) => i !== currentSongIndex);
-      setShuffledQueue(filteredOrder);
-
-      // Pick the first from the new shuffle
-      const nextIndex = filteredOrder[0];
-      setShuffledQueue((prev) => prev.slice(1));
-      setCurrentSongIndex(nextIndex);
-      setIsPlaying(true);
-    }
-  } else {
-    const nextIndex = (currentSongIndex + 1) % playlist.length;
-    setCurrentSongIndex(nextIndex);
-    setIsPlaying(true);
-  }
-};
-
+    };
 
     audio.addEventListener("timeupdate", updateProgress);
     audio.addEventListener("loadedmetadata", updateProgress);
@@ -201,40 +565,36 @@ const MusicVisualizer = () => {
       audio.removeEventListener("loadedmetadata", updateProgress);
       audio.removeEventListener("ended", handleSongEnd);
     };
-  }, [isDragging, currentSongIndex]);
+  }, [isDragging, currentSongIndex, isShuffle, shuffledQueue]);
 
-  // shuffle toggle handler
-  // shuffle toggle handler
-const handleShuffleToggle = () => {
-  setIsShuffle((prev) => {
-    const newState = !prev;
-    if (newState) {
-      // create shuffled order of all songs
-      const order = playlist.map((_, i) => i);
-
-      // shuffle array (Fisher–Yates)
-      for (let i = order.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [order[i], order[j]] = [order[j], order[i]];
+  // Shuffle toggle
+  const handleShuffleToggle = () => {
+    setIsShuffle((prev) => {
+      const newState = !prev;
+      if (newState) {
+        const order = playlist.map((_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [order[i], order[j]] = [order[j], order[i]];
+        }
+        const filteredOrder = order.filter((i) => i !== currentSongIndex);
+        setShuffledQueue(filteredOrder);
+      } else {
+        setShuffledQueue([]);
       }
+      return newState;
+    });
+  };
 
-      // 🚨 remove the currently playing song
-      const filteredOrder = order.filter((i) => i !== currentSongIndex);
-
-      setShuffledQueue(filteredOrder);
-    } else {
-      setShuffledQueue([]);
-    }
-    return newState;
-  });
-};
-
-
-  // Drag-to-seek handlers
+  // Drag-to-seek
   const getSeekTime = (e) => {
+    if (!e) return currentTime;
     const rect = progressRef.current.getBoundingClientRect();
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    const pct = Math.min(Math.max((x - rect.left) / rect.width, 0), 1);
+    let clientX;
+    if (e.touches && e.touches.length > 0) clientX = e.touches[0].clientX;
+    else if (e.clientX !== undefined) clientX = e.clientX;
+    else return currentTime;
+    const pct = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
     return pct * duration;
   };
   const handleDragStart = (e) => {
@@ -287,7 +647,7 @@ const handleShuffleToggle = () => {
     setIsPlaying(true);
   };
 
-  // ⌨️ Spacebar handler
+  // Spacebar shortcut
   useEffect(() => {
     const onKey = (e) => {
       if (e.code === "Space" || e.key === " ") {
@@ -301,6 +661,23 @@ const handleShuffleToggle = () => {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Resume playback after switching apps
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        if (isPlaying) audio.play().catch(() => {});
+      } else {
+        audio.pause();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [isPlaying]);
 
   return (
@@ -316,7 +693,7 @@ const handleShuffleToggle = () => {
 
       {isPlaying && (
         <>
-          {/* Skip & Dropdown Controls */}
+          {/* Skip Controls */}
           <button className="skip-button prev" onClick={handlePrev}>
             <IoIosArrowBack />
           </button>
@@ -326,7 +703,7 @@ const handleShuffleToggle = () => {
 
           {/* Progress Bar */}
           <div
-            className="progress-container"
+            className={`progress-container ${isDragging ? "dragging" : isPlaying ? "active" : ""}`}
             ref={progressRef}
             onMouseDown={handleDragStart}
             onMouseMove={handleDragging}
@@ -337,17 +714,19 @@ const handleShuffleToggle = () => {
           >
             <div
               className="progress-bar"
-              style={{ width: `${(currentTime / duration) * 100}%` }}
+              style={{
+                width: duration ? `${(currentTime / duration) * 100}%` : "0%",
+              }}
             />
           </div>
 
-          {/* Time & Duration */}
+          {/* Time */}
           <div className="time-info">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
 
-          {/* Rewind / Forward */}
+          {/* Seek Controls */}
           <div className="seek-controls">
             <button className="seek-button" onClick={handleRewind}>
               <TbRewindBackward10 />
@@ -357,7 +736,7 @@ const handleShuffleToggle = () => {
             </button>
           </div>
 
-          {/* Song Dropdown (moved below) */}
+          {/* Song Dropdown */}
           <div className="song-dropdown">
             <select
               value={currentSongIndex}
@@ -370,6 +749,7 @@ const handleShuffleToggle = () => {
               ))}
             </select>
           </div>
+
           {/* Shuffle Button */}
           <div className="shuffle-button">
             <button

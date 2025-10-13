@@ -331,3 +331,31 @@
 
 /* Desktop wide screens: use the default .shuffle-button placement (already above) */
 /* If you want to nudge it for ultra-wide, tweak left: calc(50% + Xpx) above */
+/* === Progress Bar Glow when dragging === */
+.progress-container.dragging .progress-bar {
+  background: linear-gradient(90deg, #fff, #9c6bff, #ff6bcb);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  transition: none; /* instant feedback while dragging */
+}
+
+/* === Shuffle Button Animation === */
+.shuffle-icon.active {
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+  animation: shufflePulse 0.4s ease;
+}
+
+@keyframes shufflePulse {
+  0% { transform: scale(1) rotate(0deg); }
+  40% { transform: scale(1.2) rotate(15deg); }
+  70% { transform: scale(0.95) rotate(-10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* === Extra Glow for Skip/Seek buttons on hover === */
+.skip-button:hover,
+.seek-button:hover {
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
+}

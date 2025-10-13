@@ -2,7 +2,11 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { playlist } from "./playlist";
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa6";
-import { TbRewindBackward10, TbRewindForward30, TbArrowsShuffle } from "react-icons/tb";
+import {
+  TbRewindBackward10,
+  TbRewindForward30,
+  TbArrowsShuffle,
+} from "react-icons/tb";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import "./MusicVisualizer.css";
 
@@ -25,7 +29,8 @@ const MusicVisualizer = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
 
-  const currentSong = playlist[currentSongIndex];
+  const [isShuffle, setIsShuffle] = useState(false);
+  const [shuffledQueue, setShuffledQueue] = useState([]); // kept for compatibility, but not required
 
   const audioRef = useRef(null);
   const canvasRef = useRef(null);
@@ -33,10 +38,35 @@ const MusicVisualizer = () => {
   const stars = useRef([]);
   const animationRef = useRef(null);
 
-  const [isShuffle, setIsShuffle] = useState(false);
-  const [shuffledQueue, setShuffledQueue] = useState([]);
+  // History stack + pointer
+  const playHistory = useRef([]);
+  const historyPointer = useRef(-1);
+  const navigatingHistory = useRef(false);
 
-  // 🔥 Pulse-on-tap utility
+  // prevPlaylistPointer removed — we'll use shuffleOrder when shuffle is on
+  // Persistent shuffle order and pointer (works in circular manner)
+  const shuffleOrder = useRef(null); // array of indices representing the shuffle cycle
+  const shufflePtr = useRef(0); // index inside shuffleOrder pointing to the currentSongIndex
+
+  const currentSong = playlist[currentSongIndex];
+
+  const pushToHistory = (idx) => {
+    if (navigatingHistory.current) return;
+    const h = playHistory.current;
+    const p = historyPointer.current;
+
+    if (p < h.length - 1) {
+      h.splice(p + 1);
+    }
+
+    if (h.length === 0 || h[h.length - 1] !== idx) {
+      h.push(idx);
+      historyPointer.current = h.length - 1;
+    } else {
+      historyPointer.current = h.length - 1;
+    }
+  };
+
   const flashButton = (e) => {
     const btn = e.currentTarget;
     if (btn.classList.contains("shuffle-icon") && isShuffle) return;
@@ -44,12 +74,12 @@ const MusicVisualizer = () => {
     setTimeout(() => btn.classList.remove("btn-flash"), 700);
   };
 
-  // Rewind / Forward
   const handleRewind = () => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.currentTime = Math.max(audio.currentTime - 10, 0);
   };
+
   const handleForward = () => {
     const audio = audioRef.current;
     if (!audio || isNaN(audio.duration)) return;
@@ -81,7 +111,6 @@ const MusicVisualizer = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // ⭐ Starfield
   const initStars = useCallback(() => {
     const w = window.innerWidth, h = window.innerHeight;
     stars.current = Array.from({ length: 800 }, () => ({
@@ -90,6 +119,7 @@ const MusicVisualizer = () => {
       z: Math.random() * w,
     }));
   }, []);
+
   const drawStars = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -133,82 +163,16 @@ const MusicVisualizer = () => {
     }
   }, [isPlaying, drawStars, initStars]);
 
-  // Audio progress & auto-advance
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const updateProgress = () => {
-      if (!isDragging) {
-        setCurrentTime(audio.currentTime);
-        setDuration(audio.duration || 0);
-      }
-    };
-
-    const handleSongEnd = () => {
-      if (isShuffle) {
-        if (shuffledQueue.length > 0) {
-          const nextIndex = shuffledQueue[0];
-          setShuffledQueue((prev) => prev.slice(1));
-          setCurrentSongIndex(nextIndex);
-        } else {
-          const order = playlist.map((_, i) => i);
-          for (let i = order.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [order[i], order[j]] = [order[j], order[i]];
-          }
-          const filteredOrder = order.filter((i) => i !== currentSongIndex);
-          setShuffledQueue(filteredOrder.slice(1));
-          setCurrentSongIndex(filteredOrder[0]);
-        }
-      } else {
-        const nextIndex = (currentSongIndex + 1) % playlist.length;
-        setCurrentSongIndex(nextIndex);
-      }
-      setIsPlaying(true);
-    };
-
-    audio.addEventListener("timeupdate", updateProgress);
-    audio.addEventListener("loadedmetadata", updateProgress);
-    audio.addEventListener("ended", handleSongEnd);
-
-    return () => {
-      audio.removeEventListener("timeupdate", updateProgress);
-      audio.removeEventListener("loadedmetadata", updateProgress);
-      audio.removeEventListener("ended", handleSongEnd);
-    };
-  }, [isDragging, currentSongIndex, isShuffle, shuffledQueue]);
-
-  // Shuffle toggle
-  const handleShuffleToggle = () => {
-    setIsShuffle((prev) => {
-      const newState = !prev;
-      if (newState) {
-        const order = playlist.map((_, i) => i);
-        for (let i = order.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [order[i], order[j]] = [order[j], order[i]];
-        }
-        const filteredOrder = order.filter((i) => i !== currentSongIndex);
-        setShuffledQueue(filteredOrder);
-      } else {
-        setShuffledQueue([]);
-      }
-      return newState;
-    });
-  };
-
-  // Drag-to-seek
   const getSeekTime = (e) => {
-    if (!e) return currentTime;
+    if (!e || !progressRef.current) return currentTime;
     const rect = progressRef.current.getBoundingClientRect();
     let clientX;
-    if (e.touches && e.touches.length > 0) clientX = e.touches[0].clientX;
-    else if (e.clientX !== undefined) clientX = e.clientX;
-    else return currentTime;
+    if (e.touches?.length > 0) clientX = e.touches[0].clientX;
+    else clientX = e.clientX;
     const pct = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
     return pct * duration;
   };
+
   const handleDragStart = (e) => {
     setIsDragging(true);
     setCurrentTime(getSeekTime(e));
@@ -234,7 +198,6 @@ const MusicVisualizer = () => {
     };
   }, []);
 
-  // Play/pause toggle
   const handleToggle = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -243,45 +206,178 @@ const MusicVisualizer = () => {
     setIsPlaying(!isPlaying);
   };
 
-  // Next / Prev
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateProgress = () => {
+      if (!isDragging) {
+        setCurrentTime(audio.currentTime);
+        setDuration(audio.duration || 0);
+      }
+    };
+
+    const onEnded = () => {
+      handleNext();
+    };
+
+    audio.addEventListener("timeupdate", updateProgress);
+    audio.addEventListener("loadedmetadata", updateProgress);
+    audio.addEventListener("ended", onEnded);
+
+    return () => {
+      audio.removeEventListener("timeupdate", updateProgress);
+      audio.removeEventListener("loadedmetadata", updateProgress);
+      audio.removeEventListener("ended", onEnded);
+    };
+  }, [isDragging, duration, shuffledQueue, isShuffle, currentSongIndex]);
+
+  // build a deterministic shuffle order that starts with currentSongIndex
+  const buildShuffleOrder = (currentIdx) => {
+    const order = playlist.map((_, i) => i);
+    // Fisher-Yates shuffle
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    // move currentIdx to the front (preserve relative order for the rest)
+    const curPos = order.indexOf(currentIdx);
+    if (curPos !== -1) {
+      order.splice(curPos, 1);
+    }
+    return [currentIdx, ...order];
+  };
+
+  const handleShuffleToggle = () => {
+    setIsShuffle((prev) => {
+      const newState = !prev;
+      if (newState) {
+        // generate persistent shuffle order
+        const order = buildShuffleOrder(currentSongIndex);
+        shuffleOrder.current = order;
+        shufflePtr.current = 0; // pointing to currentSongIndex at position 0
+        // keep shuffledQueue for compatibility (not used for traversal now)
+        setShuffledQueue(order.slice(1));
+        pushToHistory(currentSongIndex);
+      } else {
+        shuffleOrder.current = null;
+        shufflePtr.current = 0;
+        setShuffledQueue([]);
+      }
+      return newState;
+    });
+  };
+
   const handleNext = () => {
-    if (isShuffle) {
+    let nextIndex;
+
+    if (isShuffle && shuffleOrder.current && Array.isArray(shuffleOrder.current)) {
+      // move pointer forward circularly
+      shufflePtr.current = (shufflePtr.current + 1) % shuffleOrder.current.length;
+      nextIndex = shuffleOrder.current[shufflePtr.current];
+    } else if (isShuffle) {
+      // fallback to old logic if shuffleOrder not set
       if (shuffledQueue.length > 0) {
-        const nextIndex = shuffledQueue[0];
+        nextIndex = shuffledQueue[0];
         setShuffledQueue((prev) => prev.slice(1));
-        setCurrentSongIndex(nextIndex);
       } else {
         const order = playlist.map((_, i) => i);
         for (let i = order.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [order[i], order[j]] = [order[j], order[i]];
         }
-        const filteredOrder = order.filter((i) => i !== currentSongIndex);
-        setShuffledQueue(filteredOrder.slice(1));
-        setCurrentSongIndex(filteredOrder[0]);
+        const curPos = order.indexOf(currentSongIndex);
+        if (curPos !== -1) order.splice(curPos, 1);
+        nextIndex = order[0];
+        setShuffledQueue(order.slice(1));
       }
+      // if shuffleOrder wasn't present, keep history behavior as before
     } else {
-      setCurrentSongIndex((currentSongIndex + 1) % playlist.length);
+      nextIndex = (currentSongIndex + 1) % playlist.length;
     }
+
+    navigatingHistory.current = false;
+    // moving forward resets any "backward traversal mode"
+    // (no prevPlaylistPointer concept needed)
+    setCurrentSongIndex(nextIndex);
+    pushToHistory(nextIndex);
     setIsPlaying(true);
+
+    // if shuffle is on and we used shuffleOrder, ensure shufflePtr matches the nextIndex
+    if (isShuffle && shuffleOrder.current) {
+      // keep shufflePtr consistent with nextIndex (already set above)
+      // nothing else needed
+    }
   };
 
+  // handlePrev: respects history; if history exhausted -> traverse circularly
   const handlePrev = () => {
-    if (isShuffle) {
-      const idx = Math.floor(Math.random() * playlist.length);
-      setCurrentSongIndex(idx);
-    } else {
-      setCurrentSongIndex((currentSongIndex - 1 + playlist.length) % playlist.length);
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    // restart current song if more than 5 seconds played
+    if (audio.currentTime >= 5) {
+      audio.currentTime = 0;
+      return;
     }
-    setIsPlaying(true);
+
+    const h = playHistory.current;
+    let p = historyPointer.current;
+
+    if (p > 0) {
+      // step back in history
+      navigatingHistory.current = true;
+      historyPointer.current = p - 1;
+      const prevIndex = h[historyPointer.current];
+      setCurrentSongIndex(prevIndex);
+      setIsPlaying(true);
+      setTimeout(() => (navigatingHistory.current = false), 0);
+
+      // If shuffle is active, keep shuffleOrder in sync:
+      if (isShuffle && shuffleOrder.current) {
+        const pos = shuffleOrder.current.indexOf(prevIndex);
+        if (pos !== -1) shufflePtr.current = pos;
+      }
+    } else {
+      // history exhausted -> traverse circularly (shuffle-aware)
+      navigatingHistory.current = false;
+
+      if (isShuffle && shuffleOrder.current && Array.isArray(shuffleOrder.current)) {
+        // move pointer backward circularly inside shuffleOrder
+        shufflePtr.current = (shufflePtr.current - 1 + shuffleOrder.current.length) % shuffleOrder.current.length;
+        const prevIdx = shuffleOrder.current[shufflePtr.current];
+        setCurrentSongIndex(prevIdx);
+        setIsPlaying(true);
+        // Do NOT pushToHistory here; we're doing circular traversal
+      } else {
+        // non-shuffle circular traversal of playlist (existing behavior)
+        // compute previous index circularly
+        const prevIdx = (currentSongIndex - 1 + playlist.length) % playlist.length;
+        setCurrentSongIndex(prevIdx);
+        setIsPlaying(true);
+        // Not pushing to history to preserve backward traversal semantics
+      }
+    }
   };
 
   const handleSongChange = (idx) => {
+    navigatingHistory.current = false;
     setCurrentSongIndex(idx);
+    pushToHistory(idx);
     setIsPlaying(true);
+
+    // If shuffle is on, rebuild shuffleOrder to start from the chosen song
+    if (isShuffle) {
+      const order = buildShuffleOrder(idx);
+      shuffleOrder.current = order;
+      shufflePtr.current = 0;
+      setShuffledQueue(order.slice(1));
+    } else {
+      shuffleOrder.current = null;
+      shufflePtr.current = 0;
+    }
   };
 
-  // Spacebar shortcut
   useEffect(() => {
     const onKey = (e) => {
       if (e.code === "Space" || e.key === " ") {
@@ -297,33 +393,60 @@ const MusicVisualizer = () => {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  useEffect(() => {
+    // push initial song in history on mount
+    pushToHistory(currentSongIndex);
+  }, []);
+
+  // keep shufflePtr synced if currentSongIndex changes by other means (safety)
+  useEffect(() => {
+    if (isShuffle && shuffleOrder.current) {
+      const pos = shuffleOrder.current.indexOf(currentSongIndex);
+      if (pos !== -1) shufflePtr.current = pos;
+    }
+  }, [currentSongIndex, isShuffle]);
+
   return (
     <div className={`container ${isPlaying ? "stars" : "emoji-wall"}`}>
       <audio ref={audioRef} src={currentSong.src} autoPlay={isPlaying} />
       {!isPlaying && <div className="emoji-layer">{emojiElements}</div>}
       {isPlaying && <canvas ref={canvasRef} className="star-canvas" />}
 
-      {/* Central Play/Pause */}
-      <button className="music-button"
-        onClick={(e) => { handleToggle(); flashButton(e); }}>
+      <button
+        className="music-button"
+        onClick={(e) => {
+          handleToggle();
+          flashButton(e);
+        }}
+      >
         {isPlaying ? <FaPause /> : <FaPlay />}
       </button>
 
       {isPlaying && (
         <>
-          {/* Skip Controls */}
-          <button className="skip-button prev"
-            onClick={(e) => { handlePrev(); flashButton(e); }}>
+          <button
+            className="skip-button prev"
+            onClick={(e) => {
+              handlePrev();
+              flashButton(e);
+            }}
+          >
             <IoIosArrowBack />
           </button>
-          <button className="skip-button next"
-            onClick={(e) => { handleNext(); flashButton(e); }}>
+          <button
+            className="skip-button next"
+            onClick={(e) => {
+              handleNext();
+              flashButton(e);
+            }}
+          >
             <IoIosArrowForward />
           </button>
 
-          {/* Progress Bar */}
           <div
-            className={`progress-container ${isDragging ? "dragging" : isPlaying ? "active" : ""}`}
+            className={`progress-container ${
+              isDragging ? "dragging" : isPlaying ? "active" : ""
+            }`}
             ref={progressRef}
             onMouseDown={handleDragStart}
             onMouseMove={handleDragging}
@@ -334,41 +457,51 @@ const MusicVisualizer = () => {
           >
             <div
               className="progress-bar"
-              style={{ width: duration ? `${(currentTime / duration) * 100}%` : "0%" }}
+              style={{
+                width: duration ? `${(currentTime / duration) * 100}%` : "0%",
+              }}
             />
           </div>
 
-          {/* Time */}
           <div className="time-info">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
 
-          {/* Seek Controls */}
           <div className="seek-controls">
-            <button className="seek-button"
-              onClick={(e) => { handleRewind(); flashButton(e); }}>
+            <button
+              className="seek-button"
+              onClick={(e) => {
+                handleRewind();
+                flashButton(e);
+              }}
+            >
               <TbRewindBackward10 />
             </button>
-            <button className="seek-button"
-              onClick={(e) => { handleForward(); flashButton(e); }}>
+            <button
+              className="seek-button"
+              onClick={(e) => {
+                handleForward();
+                flashButton(e);
+              }}
+            >
               <TbRewindForward30 />
             </button>
           </div>
 
-          {/* Song Dropdown */}
           <div className="song-dropdown">
             <select
               value={currentSongIndex}
               onChange={(e) => handleSongChange(Number(e.target.value))}
             >
               {playlist.map((song, i) => (
-                <option key={i} value={i}>{song.name}</option>
+                <option key={i} value={i}>
+                  {song.name}
+                </option>
               ))}
             </select>
           </div>
 
-          {/* Shuffle Button */}
           <div className="shuffle-button">
             <button
               onClick={handleShuffleToggle}

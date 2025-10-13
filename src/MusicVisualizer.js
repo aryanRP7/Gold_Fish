@@ -535,7 +535,6 @@ const MusicVisualizer = () => {
           const nextIndex = shuffledQueue[0];
           setShuffledQueue((prev) => prev.slice(1));
           setCurrentSongIndex(nextIndex);
-          setIsPlaying(true);
         } else {
           const order = playlist.map((_, i) => i);
           for (let i = order.length - 1; i > 0; i--) {
@@ -543,17 +542,14 @@ const MusicVisualizer = () => {
             [order[i], order[j]] = [order[j], order[i]];
           }
           const filteredOrder = order.filter((i) => i !== currentSongIndex);
-          setShuffledQueue(filteredOrder);
-          const nextIndex = filteredOrder[0];
-          setShuffledQueue((prev) => prev.slice(1));
-          setCurrentSongIndex(nextIndex);
-          setIsPlaying(true);
+          setShuffledQueue(filteredOrder.slice(1));
+          setCurrentSongIndex(filteredOrder[0]);
         }
       } else {
         const nextIndex = (currentSongIndex + 1) % playlist.length;
         setCurrentSongIndex(nextIndex);
-        setIsPlaying(true);
       }
+      setIsPlaying(true);
     };
 
     audio.addEventListener("timeupdate", updateProgress);
@@ -631,17 +627,39 @@ const MusicVisualizer = () => {
     setIsPlaying(!isPlaying);
   };
 
-  // Prev / Next / Song change
-  const handlePrev = () => {
-    const idx = (currentSongIndex - 1 + playlist.length) % playlist.length;
-    setCurrentSongIndex(idx);
-    setIsPlaying(true);
-  };
+  // Next / Prev respecting shuffle
   const handleNext = () => {
-    const idx = (currentSongIndex + 1) % playlist.length;
-    setCurrentSongIndex(idx);
+    if (isShuffle) {
+      if (shuffledQueue.length > 0) {
+        const nextIndex = shuffledQueue[0];
+        setShuffledQueue((prev) => prev.slice(1));
+        setCurrentSongIndex(nextIndex);
+      } else {
+        const order = playlist.map((_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [order[i], order[j]] = [order[j], order[i]];
+        }
+        const filteredOrder = order.filter((i) => i !== currentSongIndex);
+        setShuffledQueue(filteredOrder.slice(1));
+        setCurrentSongIndex(filteredOrder[0]);
+      }
+    } else {
+      setCurrentSongIndex((currentSongIndex + 1) % playlist.length);
+    }
     setIsPlaying(true);
   };
+
+  const handlePrev = () => {
+    if (isShuffle) {
+      const idx = Math.floor(Math.random() * playlist.length);
+      setCurrentSongIndex(idx);
+    } else {
+      setCurrentSongIndex((currentSongIndex - 1 + playlist.length) % playlist.length);
+    }
+    setIsPlaying(true);
+  };
+
   const handleSongChange = (idx) => {
     setCurrentSongIndex(idx);
     setIsPlaying(true);
@@ -663,17 +681,18 @@ const MusicVisualizer = () => {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Resume playback after switching apps
+  // Mobile / app switch handling
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         if (isPlaying) audio.play().catch(() => {});
-      } else {
-        audio.pause();
       }
+      // Don't pause on hide → allows mobile background audio to resume
     };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);

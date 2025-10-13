@@ -37,37 +37,7 @@
 
 
 
-/* Skip Buttons */
-.skip-button {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 2rem;
-  padding: 0.5rem;
-  border: none;
-  background: none;
-  color: rgba(240, 240, 240, 0.35);
-  cursor: pointer;
-  z-index: 10;
-  transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
-  text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
-}
-.skip-button:hover {
-  transform: translate(-50%, -50%) scale(1.1);
-  color: rgba(255, 255, 255, 0.6);
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-}
-.skip-button:active {
-  transform: translate(-50%, -50%) scale(0.95);
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
-}
 
-.skip-button.prev {
-  left: calc(50% - 6rem);
-}
-.skip-button.next {
-  left: calc(50% + 6rem);
-}
 
 /* Seek Controls */
 .seek-controls {
@@ -353,9 +323,31 @@
   100% { transform: scale(1) rotate(0deg); }
 }
 
-/* === Extra Glow for Skip/Seek buttons on hover === */
+/* Skip & Seek Buttons Hover/Active */
+.skip-button,
+.seek-button {
+  font-size: 1.8rem;
+  border: none;
+  background: none;
+  color: rgba(240, 240, 240, 0.35);
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
+}
+
+/* Hover on desktop */
 .skip-button:hover,
 .seek-button:hover {
-  color: rgba(255, 255, 255, 0.85);
+  transform: scale(1.1);
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Active (only during click/tap) */
+.skip-button:active,
+.seek-button:active {
+  transform: scale(0.95);
+  color: rgba(255, 255, 255, 0.85); /* white only while pressing */
   text-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
+  transition: none; /* instant feedback */
 }

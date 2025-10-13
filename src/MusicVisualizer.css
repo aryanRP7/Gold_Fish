@@ -1,4 +1,5 @@
-/* Container */ 
+/* Original css*/
+/* Container */
 .container {
   width: 100vw;
   height: 100vh;
@@ -20,22 +21,22 @@
   padding: 0.5rem;
   border: none;
   background: none;
-  color: rgba(240, 240, 240, 0.35);
+  color: rgba(240, 240, 240, 0.35); /* blackish-white with transparency */
   cursor: pointer;
   transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
-  text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.08); /* soft glow */
 }
 .music-button:hover {
   transform: translate(-50%, -50%) scale(1.1);
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.6); /* lighten on hover */
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 .music-button:active {
   transform: translate(-50%, -50%) scale(0.95);
-  color: rgba(255, 255, 255, 0.85);
-  text-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
-  transition: transform 0.1s ease, color 0.2s ease, text-shadow 0.2s ease;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
 }
+
+
 
 /* Skip Buttons */
 .skip-button {
@@ -52,8 +53,6 @@
   transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
   text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
 }
-.skip-button.prev { left: calc(50% - 6rem); }
-.skip-button.next { left: calc(50% + 6rem); }
 .skip-button:hover {
   transform: translate(-50%, -50%) scale(1.1);
   color: rgba(255, 255, 255, 0.6);
@@ -61,8 +60,14 @@
 }
 .skip-button:active {
   transform: translate(-50%, -50%) scale(0.95);
-  color: rgba(255, 255, 255, 0.85);
-  text-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
+}
+
+.skip-button.prev {
+  left: calc(50% - 6rem);
+}
+.skip-button.next {
+  left: calc(50% + 6rem);
 }
 
 /* Seek Controls */
@@ -75,6 +80,7 @@
   gap: 2rem;
   z-index: 10;
 }
+
 .seek-button {
   font-size: 1.8rem;
   border: none;
@@ -91,17 +97,9 @@
 }
 .seek-button:active {
   transform: scale(0.95);
-  color: rgba(255, 255, 255, 0.85);
-  text-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
 }
 
-/* Base color for all buttons */
-.music-button,
-.skip-button,
-.seek-button {
-  color: rgba(240, 240, 240, 0.35);
-  transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
-}
 
 /* Emoji‑Wall Background + Sparkle */
 .emoji-wall {
@@ -111,7 +109,10 @@
   position: relative;
   transition: background 2s ease;
 }
-@keyframes waveGradient { 0%,100%{background-position:0% 50%}50%{background-position:100% 50%} }
+@keyframes waveGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
 .emoji-wall::after {
   content: '';
   position: absolute;
@@ -138,7 +139,10 @@
   will-change: transform, opacity;
   animation: floatBubble linear infinite;
 }
-@keyframes floatBubble { 0%{transform:translateY(0) scale(1);opacity:0.7}100%{transform:translateY(-100vh) scale(1.3);opacity:0} }
+@keyframes floatBubble {
+  0%   { transform: translateY(0) scale(1); opacity: 0.7; }
+  100% { transform: translateY(-100vh) scale(1.3); opacity: 0; }
+}
 
 /* Star Canvas */
 .star-canvas {
@@ -163,13 +167,19 @@
   opacity: 0.5;
   transition: opacity 0.3s ease;
 }
-.progress-container:hover { opacity: 1; }
-.progress-bar { height: 100%; background: rgba(255,255,255,0.6); border-radius: 3px; transition: width 0.2s ease; }
-.progress-container.dragging .progress-bar {
-  background: linear-gradient(90deg,#fff,#9c6bff,#ff6bcb);
-  box-shadow: 0 0 10px rgba(255,255,255,0.6);
-  transition: none;
+.progress-container:hover {
+  opacity: 1;
 }
+.progress-bar {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+
+
+
 
 /* Time Info */
 .time-info {
@@ -180,7 +190,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
+   color: rgba(255, 255, 255, 0.6);
   z-index: 10;
 }
 
@@ -197,25 +207,54 @@
   cursor: pointer;
   transition: background 0.3s ease;
 }
-.song-dropdown:hover { background: rgba(255,255,255,0.1); }
+.song-dropdown:hover {
+  background: rgba(255,255,255,0.1);
+}
 .song-dropdown select {
   background: black;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+   color: rgba(255, 255, 255, 0.6);
   font-family: inherit;
   font-size: 0.9rem;
   outline: none;
   cursor: pointer;
 }
 
-/* Shuffle Button */
+
+/* 📱 Mobile (≤768px) */
+@media (max-width: 768px) {
+  .seek-controls {
+    top: calc(50% + 6rem);
+    gap: 1.5rem;
+  }
+
+  .song-dropdown {
+    top: calc(50% + 10.5rem); /* extra space for mobile */
+    right: 10%; /* closer to edge */
+  }
+}
+
+/* 📺 Tablet / iPad Pro (769px–1200px) */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .seek-controls {
+    top: calc(50% + 6rem);
+  }
+
+  .song-dropdown {
+    top: calc(50% + 10rem);
+    right: 15%; /* slightly inward */
+  }
+}
+/* Shuffle Button base */
 .shuffle-button {
   position: absolute;
-  top: calc(50% + 5.5rem);
-  left: calc(50% + 8rem);
+  top: calc(50% + 5.5rem);        /* align with seek-controls vertical position */
+  left: calc(50% + 8rem);         /* place to the right of center (between center controls and right dropdown) */
   transform: translateY(-50%);
   z-index: 10;
 }
+
+
 .shuffle-icon {
   font-size: 1.6rem;
   border: none;
@@ -233,33 +272,63 @@
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.12);
 }
 .shuffle-icon.active {
-  color: #fff;
+  color: #fff; /* solid white when active */
   font-weight: 700;
   text-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
-  animation: shufflePulse 0.4s ease;
-}
-@keyframes shufflePulse {
-  0% { transform: scale(1) rotate(0deg); }
-  40% { transform: scale(1.2) rotate(15deg); }
-  70% { transform: scale(0.95) rotate(-10deg); }
-  100% { transform: scale(1) rotate(0deg); }
 }
 
-/* Mobile adjustments */
+/* Mobile: place shuffle above dropdown and right-aligned */
 @media (max-width: 768px) {
-  .seek-controls { top: calc(50% + 6rem); gap: 1.5rem; }
-  .song-dropdown { top: calc(50% + 10.5rem); right: 10%; }
-  .shuffle-button { top: calc(50% + 9.5rem); right: 10%; left: auto; }
+  .shuffle-button {
+    top: calc(50% + 9.5rem); /* slightly above the dropdown top */
+    right: 10%;
+    left: auto;
+    transform: translateY(-50%);
+  }
+
+  .song-dropdown {
+    top: calc(50% + 10.5rem); /* keep dropdown below shuffle */
+    right: 10%;
+  }
 }
 
-/* Tablet adjustments */
+/* Tablet / iPad Pro: slightly different offsets but still between center and right dropdown */
+/* Mobile & iPad (<= 1200px): place shuffle above dropdown, right aligned */
+@media (max-width: 1200px) {
+  .shuffle-button {
+    top: calc(50% + 9.5rem); /* slightly above dropdown */
+    right: 10%;
+    left: auto;
+    transform: translateY(-50%);
+  }
+
+  .song-dropdown {
+    top: calc(50% + 10.5rem); /* keep dropdown below shuffle */
+    right: 10%;
+  }
+}
+
+/* iPad Pro only: 769px–1200px */
 @media (min-width: 769px) and (max-width: 1200px) {
-  .seek-controls { top: calc(50% + 6rem); }
-  .song-dropdown { top: calc(50% + 10rem); right: 15%; }
-  .shuffle-button { top: calc(50% + 9.5rem); right: 20%; left: auto; }
+  .shuffle-button {
+    top: calc(50% + 9.5rem);
+    right: 20%; /* align with progress bar right edge */
+    left: auto;
+  }
+
+  .song-dropdown {
+    top: calc(50% + 10.5rem);
+    right: 20%; /* align with progress bar right edge */
+  }
 }
 
-/* Desktop adjustments */
+
+/* Desktop only (≥1201px) */
 @media (min-width: 1201px) {
-  .shuffle-button { top: calc(50% + 6.5rem); }
+  .shuffle-button {
+    top: calc(50% + 6.5rem); /* lower by 1rem */
+  }
 }
+
+/* Desktop wide screens: use the default .shuffle-button placement (already above) */
+/* If you want to nudge it for ultra-wide, tweak left: calc(50% + Xpx) above */

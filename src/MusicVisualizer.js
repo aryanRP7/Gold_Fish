@@ -9,6 +9,8 @@ import {
 } from "react-icons/tb";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import "./MusicVisualizer.css";
+// ✅ Import your separate email.js file
+import { sendHiEmail } from "./email"; // adjust the path as needed
 
 const emojis = [
   "😄", "🌻", "😍", "🥰", "😘", "✨", "💞", "🌻",
@@ -202,7 +204,8 @@ const MusicVisualizer = () => {
     const audio = audioRef.current;
     if (!audio) return;
     if (isPlaying) audio.pause();
-    else audio.play();
+    else {audio.play();
+     sendHiEmail();} // send email when music starts
     setIsPlaying(!isPlaying);
   };
 

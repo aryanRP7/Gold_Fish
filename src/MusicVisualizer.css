@@ -175,10 +175,6 @@
   border-radius: 3px;
   transition: width 0.2s ease;
 }
-.progress-container {
-  touch-action: none; /* prevents page scroll during touch drag */
-  -ms-touch-action: none;
-}
 
 
 
@@ -353,4 +349,7 @@
     color: rgba(240, 240, 240, 0.35) !important;
     text-shadow: 0 0 4px rgba(255, 255, 255, 0.08) !important;
   }
+}
+.progress-container.dragging {
+  cursor: grabbing !important;
 }

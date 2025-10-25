@@ -30,8 +30,6 @@ const MusicVisualizer = () => {
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const wasPlayingRef = useRef(false);
-
 
   const [isShuffle, setIsShuffle] = useState(false);
   const [shuffledQueue, setShuffledQueue] = useState([]); // kept for compatibility, but not required
@@ -177,64 +175,61 @@ const MusicVisualizer = () => {
     return pct * duration;
   };
 
-// Replace your existing handlers with this block
-const handleDragStart = (e) => {
-  // Only prevent default for touch events (don't block normal mouse clicks)
-  if (e.type && e.type.startsWith("touch")) e.preventDefault();
+  const handleDragStart = (e) => {
+    setIsDragging(true);
+    setCurrentTime(getSeekTime(e));
+  };
+  const handleDragging = (e) => {
+    if (!isDragging) return;
+    setCurrentTime(getSeekTime(e));
+  };
+  const handleDragEnd = (e) => {
+    if (!isDragging) return;
+    const t = getSeekTime(e);
+    audioRef.current.currentTime = t;
+    setCurrentTime(t);
+    setIsDragging(false);
+  };
+useEffect(() => {
+  const handleMove = (e) => {
+    if (!isDragging) return;
+    setCurrentTime(getSeekTime(e));
+  };
 
-  setIsDragging(true);
-  setCurrentTime(getSeekTime(e));
+  const handleUp = (e) => {
+    if (!isDragging) return;
+    const t = getSeekTime(e);
+    audioRef.current.currentTime = t;
+    setCurrentTime(t);
+    setIsDragging(false);
+    document.body.style.cursor = ""; // reset cursor
+  };
 
-  const audio = audioRef.current;
-  // store whether audio was playing before drag in a ref so we can resume correctly
-  wasPlayingRef.current = !!(audio && !audio.paused);
-
-  if (audio && !audio.paused) {
-    audio.pause(); // pause while dragging to avoid NaN / auto-next behavior
+  if (isDragging) {
+    document.body.style.cursor = "grabbing";
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("touchmove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+    window.addEventListener("touchend", handleUp);
   }
-};
 
-const handleDragging = (e) => {
-  if (!isDragging) return;
-  if (e.type && e.type.startsWith("touch")) e.preventDefault();
-  setCurrentTime(getSeekTime(e));
-};
+  return () => {
+    window.removeEventListener("mousemove", handleMove);
+    window.removeEventListener("touchmove", handleMove);
+    window.removeEventListener("mouseup", handleUp);
+    window.removeEventListener("touchend", handleUp);
+    document.body.style.cursor = "";
+  };
+}, [isDragging]);
 
-const handleDragEnd = (e) => {
-  if (!isDragging) return;
-  if (e.type && e.type.startsWith("touch")) e.preventDefault();
-
-  const t = getSeekTime(e);
-  const audio = audioRef.current;
-  if (audio) {
-    audio.currentTime = t; // seek
-    // resume playback only if it was playing before drag
-    if (wasPlayingRef.current) {
-      audio.play().catch(() => {});
-    }
-  }
-  setCurrentTime(t);
-  setIsDragging(false);
-};
-
-
-  useEffect(() => {
-    const stop = () => setIsDragging(false);
-    window.addEventListener("mouseup", stop);
-    window.addEventListener("touchend", stop);
-    return () => {
-      window.removeEventListener("mouseup", stop);
-      window.removeEventListener("touchend", stop);
-    };
-  }, []);
 
   const handleToggle = () => {
     const audio = audioRef.current;
     if (!audio) return;
     if (isPlaying) audio.pause();
     else {audio.play();
-    // sendHiEmail();// send email when music starts
-  } 
+    //  sendHiEmail();
+    } // send email when music starts
     setIsPlaying(!isPlaying);
   };
 
@@ -279,17 +274,6 @@ const handleDragEnd = (e) => {
     }
     return [currentIdx, ...order];
   };
-const handleClickSeek = (e) => {
-  // If user was dragging, ignore click (prevents double-seek)
-  if (isDragging) return;
-
-  const t = getSeekTime(e);
-  const audio = audioRef.current;
-  if (audio) {
-    audio.currentTime = t;
-    setCurrentTime(t);
-  }
-};
 
   const handleShuffleToggle = () => {
     setIsShuffle((prev) => {
@@ -487,14 +471,10 @@ const handleClickSeek = (e) => {
               isDragging ? "dragging" : isPlaying ? "active" : ""
             }`}
             ref={progressRef}
-            style={{ touchAction: "none" }}
-            onMouseDown={handleDragStart}
-            onMouseMove={handleDragging}
-            onMouseUp={handleDragEnd}
-            onTouchStart={handleDragStart}
-            onTouchMove={handleDragging}
-            onTouchEnd={handleDragEnd}
-            onClick={handleClickSeek}  
+onMouseDown={handleDragStart}
+onTouchStart={handleDragStart}
+
+
           >
             <div
               className="progress-bar"

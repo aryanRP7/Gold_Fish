@@ -233,7 +233,8 @@ const handleDragEnd = (e) => {
     if (!audio) return;
     if (isPlaying) audio.pause();
     else {audio.play();
-    //  sendHiEmail();} // send email when music starts
+    // sendHiEmail();// send email when music starts
+  } 
     setIsPlaying(!isPlaying);
   };
 

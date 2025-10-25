@@ -175,6 +175,10 @@
   border-radius: 3px;
   transition: width 0.2s ease;
 }
+.progress-container {
+  touch-action: none; /* prevents page scroll during touch drag */
+  -ms-touch-action: none;
+}
 
 
 

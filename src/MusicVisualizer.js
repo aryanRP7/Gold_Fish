@@ -176,20 +176,37 @@ const MusicVisualizer = () => {
   };
 
   const handleDragStart = (e) => {
-    setIsDragging(true);
-    setCurrentTime(getSeekTime(e));
-  };
-  const handleDragging = (e) => {
-    if (!isDragging) return;
-    setCurrentTime(getSeekTime(e));
-  };
-  const handleDragEnd = (e) => {
-    if (!isDragging) return;
-    const t = getSeekTime(e);
-    audioRef.current.currentTime = t;
-    setCurrentTime(t);
-    setIsDragging(false);
-  };
+  e.preventDefault(); // ✅ prevent scroll/pan on mobile
+  setIsDragging(true);
+  setCurrentTime(getSeekTime(e));
+
+  const audio = audioRef.current;
+  if (audio && !audio.paused) {
+    audio.pause(); // ✅ pause while dragging to prevent NaN / skip
+  }
+};
+
+const handleDragging = (e) => {
+  if (!isDragging) return;
+  e.preventDefault(); // ✅ prevent scroll interference
+  setCurrentTime(getSeekTime(e));
+};
+
+const handleDragEnd = (e) => {
+  if (!isDragging) return;
+  e.preventDefault();
+  const t = getSeekTime(e);
+  const audio = audioRef.current;
+  if (audio) {
+    audio.currentTime = t; // ✅ seek to new position
+    if (isPlaying) {
+      audio.play().catch(() => {}); // ✅ resume playback
+    }
+  }
+  setCurrentTime(t);
+  setIsDragging(false);
+};
+
   useEffect(() => {
     const stop = () => setIsDragging(false);
     window.addEventListener("mouseup", stop);
@@ -447,6 +464,7 @@ const MusicVisualizer = () => {
               isDragging ? "dragging" : isPlaying ? "active" : ""
             }`}
             ref={progressRef}
+            style={{ touchAction: "none" }}
             onMouseDown={handleDragStart}
             onMouseMove={handleDragging}
             onMouseUp={handleDragEnd}

@@ -13,13 +13,30 @@ import "./MusicVisualizer.css";
 import { sendHiEmail } from "./email"; // adjust the path as needed
 
 const emojis = [
-  "😄", "🌻", "😍", "🥰", "😘", "✨", "💞", "🌻",
-  "❤️", "😻", "💙", "🤩", "🦚", "🌻", "🧋",
+  "😄",
+  "🌻",
+  "😍",
+  "🥰",
+  "😘",
+  "✨",
+  "💞",
+  "🌻",
+  "❤️",
+  "😻",
+  "💙",
+  "🤩",
+  "🦚",
+  "🌻",
+  "🧋",
 ];
 
 const formatTime = (time) => {
-  const minutes = Math.floor(time / 60).toString().padStart(2, "0");
-  const seconds = Math.floor(time % 60).toString().padStart(2, "0");
+  const minutes = Math.floor(time / 60)
+    .toString()
+    .padStart(2, "0");
+  const seconds = Math.floor(time % 60)
+    .toString()
+    .padStart(2, "0");
   return `${minutes}:${seconds}`;
 };
 
@@ -114,7 +131,8 @@ const MusicVisualizer = () => {
   }, []);
 
   const initStars = useCallback(() => {
-    const w = window.innerWidth, h = window.innerHeight;
+    const w = window.innerWidth,
+      h = window.innerHeight;
     stars.current = Array.from({ length: 800 }, () => ({
       x: (Math.random() - 0.5) * w,
       y: (Math.random() - 0.5) * h,
@@ -128,7 +146,8 @@ const MusicVisualizer = () => {
     const ctx = canvas.getContext("2d");
     const w = (canvas.width = window.innerWidth);
     const h = (canvas.height = window.innerHeight);
-    const cx = w / 2, cy = h / 2;
+    const cx = w / 2,
+      cy = h / 2;
 
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, w, h);
@@ -166,27 +185,26 @@ const MusicVisualizer = () => {
   }, [isPlaying, drawStars, initStars]);
 
   const getSeekTime = (e) => {
-  if (!progressRef.current || !duration) return currentTime;
+    if (!progressRef.current || !duration) return currentTime;
 
-  const rect = progressRef.current.getBoundingClientRect();
-  let clientX;
+    const rect = progressRef.current.getBoundingClientRect();
+    let clientX;
 
-  if (e.touches && e.touches.length > 0) {
-    clientX = e.touches[0].pageX; // ✅ use pageX for mobile accuracy
-  } else {
-    clientX = e.pageX;
-  }
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].pageX; // ✅ use pageX for mobile accuracy
+    } else {
+      clientX = e.pageX;
+    }
 
-  // calculate progress
-  let pct = (clientX - rect.left) / rect.width;
-  pct = Math.min(Math.max(pct, 0), 1); // clamp between 0 and 1
+    // calculate progress
+    let pct = (clientX - rect.left) / rect.width;
+    pct = Math.min(Math.max(pct, 0), 1); // clamp between 0 and 1
 
-  // sometimes iOS sends weird jumps on quick drags — dampen them
-  if (pct >= 0.995) pct = 0.995;
+    // sometimes iOS sends weird jumps on quick drags — dampen them
+    if (pct >= 0.995) pct = 0.995;
 
-  return pct * duration;
-};
-
+    return pct * duration;
+  };
 
   const handleDragStart = (e) => {
     setIsDragging(true);
@@ -203,48 +221,47 @@ const MusicVisualizer = () => {
     setCurrentTime(t);
     setIsDragging(false);
   };
-useEffect(() => {
-const handleMove = (e) => {
-  if (!isDragging) return;
-  e.preventDefault();
-  setCurrentTime(getSeekTime(e));
-};
+  useEffect(() => {
+    const handleMove = (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      setCurrentTime(getSeekTime(e));
+    };
 
+    const handleUp = (e) => {
+      if (!isDragging) return;
+      const t = getSeekTime(e);
+      audioRef.current.currentTime = t;
+      setCurrentTime(t);
+      setIsDragging(false);
+      document.body.style.cursor = ""; // reset cursor
+    };
 
-  const handleUp = (e) => {
-    if (!isDragging) return;
-    const t = getSeekTime(e);
-    audioRef.current.currentTime = t;
-    setCurrentTime(t);
-    setIsDragging(false);
-    document.body.style.cursor = ""; // reset cursor
-  };
+    if (isDragging) {
+      document.body.style.cursor = "grabbing";
+      window.addEventListener("mousemove", handleMove);
+      window.addEventListener("touchmove", handleMove, { passive: false });
+      window.addEventListener("mouseup", handleUp);
+      window.addEventListener("touchend", handleUp);
+    }
 
-  if (isDragging) {
-    document.body.style.cursor = "grabbing";
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("touchmove", handleMove, { passive: false });
-    window.addEventListener("mouseup", handleUp);
-    window.addEventListener("touchend", handleUp);
-  }
-
-  return () => {
-    window.removeEventListener("mousemove", handleMove);
-    window.removeEventListener("touchmove", handleMove);
-    window.removeEventListener("mouseup", handleUp);
-    window.removeEventListener("touchend", handleUp);
-    document.body.style.cursor = "";
-  };
-}, [isDragging]);
-
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("touchmove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+      window.removeEventListener("touchend", handleUp);
+      document.body.style.cursor = "";
+    };
+  }, [isDragging]);
 
   const handleToggle = () => {
     const audio = audioRef.current;
     if (!audio) return;
     if (isPlaying) audio.pause();
-    else {audio.play();
-    //  sendHiEmail();
-    } // send email when music starts
+    else {
+      audio.play();
+       sendHiEmail(); //// send email when music starts
+    } 
     setIsPlaying(!isPlaying);
   };
 
@@ -311,82 +328,87 @@ const handleMove = (e) => {
   };
 
   const handleNext = () => {
-  let nextIndex;
+    let nextIndex;
 
-  if (isShuffle) {
-    if (!shuffleOrder.current || shuffleOrder.current.length === 0) {
-      // first time or reset case
-      shuffleOrder.current = buildShuffleOrder(currentSongIndex);
-      shufflePtr.current = 0;
+    if (isShuffle) {
+      if (!shuffleOrder.current || shuffleOrder.current.length === 0) {
+        // first time or reset case
+        shuffleOrder.current = buildShuffleOrder(currentSongIndex);
+        shufflePtr.current = 0;
+      }
+
+      // move forward
+      shufflePtr.current += 1;
+
+      // ✅ if reached end, rebuild new shuffle order for next cycle
+      if (shufflePtr.current >= shuffleOrder.current.length) {
+        shuffleOrder.current = buildShuffleOrder(currentSongIndex);
+        shufflePtr.current = 1; // start right after current song
+      }
+
+      nextIndex = shuffleOrder.current[shufflePtr.current];
+    } else {
+      // normal (non-shuffle) mode
+      nextIndex = (currentSongIndex + 1) % playlist.length;
     }
 
-    // move forward
-    shufflePtr.current += 1;
-
-    // ✅ if reached end, rebuild new shuffle order for next cycle
-    if (shufflePtr.current >= shuffleOrder.current.length) {
-      shuffleOrder.current = buildShuffleOrder(currentSongIndex);
-      shufflePtr.current = 1; // start right after current song
-    }
-
-    nextIndex = shuffleOrder.current[shufflePtr.current];
-  } else {
-    // normal (non-shuffle) mode
-    nextIndex = (currentSongIndex + 1) % playlist.length;
-  }
-
-  navigatingHistory.current = false;
-  setCurrentSongIndex(nextIndex);
-  pushToHistory(nextIndex);
-  setIsPlaying(true);
-};
-
+    navigatingHistory.current = false;
+    setCurrentSongIndex(nextIndex);
+    pushToHistory(nextIndex);
+    setIsPlaying(true);
+  };
 
   // handlePrev: respects history; if history exhausted -> traverse circularly
   const handlePrev = () => {
-  const audio = audioRef.current;
-  if (!audio) return;
+    const audio = audioRef.current;
+    if (!audio) return;
 
-  // ✅ 3-second rule: If current time > 3s, restart same song
-  if (audio.currentTime > 3) {
-    audio.currentTime = 0;
-    return;
-  }
-
-  const h = playHistory.current;
-  let p = historyPointer.current;
-
-  if (p > 0) {
-    // step back in history
-    navigatingHistory.current = true;
-    historyPointer.current = p - 1;
-    const prevIndex = h[historyPointer.current];
-    setCurrentSongIndex(prevIndex);
-    setIsPlaying(true);
-    setTimeout(() => (navigatingHistory.current = false), 0);
-
-    // keep shuffle pointer synced if active
-    if (isShuffle && shuffleOrder.current) {
-      const pos = shuffleOrder.current.indexOf(prevIndex);
-      if (pos !== -1) shufflePtr.current = pos;
+    // ✅ 3-second rule: If current time > 3s, restart same song
+    if (audio.currentTime > 3) {
+      audio.currentTime = 0;
+      return;
     }
-  } else {
-    // history exhausted -> circular traversal
-    navigatingHistory.current = false;
 
-    if (isShuffle && shuffleOrder.current && Array.isArray(shuffleOrder.current)) {
-      shufflePtr.current = (shufflePtr.current - 1 + shuffleOrder.current.length) % shuffleOrder.current.length;
-      const prevIdx = shuffleOrder.current[shufflePtr.current];
-      setCurrentSongIndex(prevIdx);
+    const h = playHistory.current;
+    let p = historyPointer.current;
+
+    if (p > 0) {
+      // step back in history
+      navigatingHistory.current = true;
+      historyPointer.current = p - 1;
+      const prevIndex = h[historyPointer.current];
+      setCurrentSongIndex(prevIndex);
       setIsPlaying(true);
+      setTimeout(() => (navigatingHistory.current = false), 0);
+
+      // keep shuffle pointer synced if active
+      if (isShuffle && shuffleOrder.current) {
+        const pos = shuffleOrder.current.indexOf(prevIndex);
+        if (pos !== -1) shufflePtr.current = pos;
+      }
     } else {
-      const prevIdx = (currentSongIndex - 1 + playlist.length) % playlist.length;
-      setCurrentSongIndex(prevIdx);
-      setIsPlaying(true);
-    }
-  }
-};
+      // history exhausted -> circular traversal
+      navigatingHistory.current = false;
 
+      if (
+        isShuffle &&
+        shuffleOrder.current &&
+        Array.isArray(shuffleOrder.current)
+      ) {
+        shufflePtr.current =
+          (shufflePtr.current - 1 + shuffleOrder.current.length) %
+          shuffleOrder.current.length;
+        const prevIdx = shuffleOrder.current[shufflePtr.current];
+        setCurrentSongIndex(prevIdx);
+        setIsPlaying(true);
+      } else {
+        const prevIdx =
+          (currentSongIndex - 1 + playlist.length) % playlist.length;
+        setCurrentSongIndex(prevIdx);
+        setIsPlaying(true);
+      }
+    }
+  };
 
   const handleSongChange = (idx) => {
     navigatingHistory.current = false;
@@ -472,17 +494,16 @@ const handleMove = (e) => {
           </button>
 
           <div
-  className={`progress-container ${
-    isDragging ? "dragging" : isPlaying ? "active" : ""
-  }`}
-  ref={progressRef}
-  onMouseDown={handleDragStart}
-  onTouchStart={(e) => {
-    e.preventDefault(); // stop scroll interference
-    handleDragStart(e);
-  }}
->
-
+            className={`progress-container ${
+              isDragging ? "dragging" : isPlaying ? "active" : ""
+            }`}
+            ref={progressRef}
+            onMouseDown={handleDragStart}
+            onTouchStart={(e) => {
+              e.preventDefault(); // stop scroll interference
+              handleDragStart(e);
+            }}
+          >
             <div
               className="progress-bar"
               style={{

@@ -166,14 +166,27 @@ const MusicVisualizer = () => {
   }, [isPlaying, drawStars, initStars]);
 
   const getSeekTime = (e) => {
-    if (!e || !progressRef.current) return currentTime;
-    const rect = progressRef.current.getBoundingClientRect();
-    let clientX;
-    if (e.touches?.length > 0) clientX = e.touches[0].clientX;
-    else clientX = e.clientX;
-    const pct = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
-    return pct * duration;
-  };
+  if (!progressRef.current || !duration) return currentTime;
+
+  const rect = progressRef.current.getBoundingClientRect();
+  let clientX;
+
+  if (e.touches && e.touches.length > 0) {
+    clientX = e.touches[0].pageX; // ✅ use pageX for mobile accuracy
+  } else {
+    clientX = e.pageX;
+  }
+
+  // calculate progress
+  let pct = (clientX - rect.left) / rect.width;
+  pct = Math.min(Math.max(pct, 0), 1); // clamp between 0 and 1
+
+  // sometimes iOS sends weird jumps on quick drags — dampen them
+  if (pct >= 0.995) pct = 0.995;
+
+  return pct * duration;
+};
+
 
   const handleDragStart = (e) => {
     setIsDragging(true);
@@ -191,10 +204,12 @@ const MusicVisualizer = () => {
     setIsDragging(false);
   };
 useEffect(() => {
-  const handleMove = (e) => {
-    if (!isDragging) return;
-    setCurrentTime(getSeekTime(e));
-  };
+const handleMove = (e) => {
+  if (!isDragging) return;
+  e.preventDefault();
+  setCurrentTime(getSeekTime(e));
+};
+
 
   const handleUp = (e) => {
     if (!isDragging) return;
@@ -208,7 +223,7 @@ useEffect(() => {
   if (isDragging) {
     document.body.style.cursor = "grabbing";
     window.addEventListener("mousemove", handleMove);
-    window.addEventListener("touchmove", handleMove);
+    window.addEventListener("touchmove", handleMove, { passive: false });
     window.addEventListener("mouseup", handleUp);
     window.addEventListener("touchend", handleUp);
   }
@@ -296,46 +311,36 @@ useEffect(() => {
   };
 
   const handleNext = () => {
-    let nextIndex;
+  let nextIndex;
 
-    if (isShuffle && shuffleOrder.current && Array.isArray(shuffleOrder.current)) {
-      // move pointer forward circularly
-      shufflePtr.current = (shufflePtr.current + 1) % shuffleOrder.current.length;
-      nextIndex = shuffleOrder.current[shufflePtr.current];
-    } else if (isShuffle) {
-      // fallback to old logic if shuffleOrder not set
-      if (shuffledQueue.length > 0) {
-        nextIndex = shuffledQueue[0];
-        setShuffledQueue((prev) => prev.slice(1));
-      } else {
-        const order = playlist.map((_, i) => i);
-        for (let i = order.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [order[i], order[j]] = [order[j], order[i]];
-        }
-        const curPos = order.indexOf(currentSongIndex);
-        if (curPos !== -1) order.splice(curPos, 1);
-        nextIndex = order[0];
-        setShuffledQueue(order.slice(1));
-      }
-      // if shuffleOrder wasn't present, keep history behavior as before
-    } else {
-      nextIndex = (currentSongIndex + 1) % playlist.length;
+  if (isShuffle) {
+    if (!shuffleOrder.current || shuffleOrder.current.length === 0) {
+      // first time or reset case
+      shuffleOrder.current = buildShuffleOrder(currentSongIndex);
+      shufflePtr.current = 0;
     }
 
-    navigatingHistory.current = false;
-    // moving forward resets any "backward traversal mode"
-    // (no prevPlaylistPointer concept needed)
-    setCurrentSongIndex(nextIndex);
-    pushToHistory(nextIndex);
-    setIsPlaying(true);
+    // move forward
+    shufflePtr.current += 1;
 
-    // if shuffle is on and we used shuffleOrder, ensure shufflePtr matches the nextIndex
-    if (isShuffle && shuffleOrder.current) {
-      // keep shufflePtr consistent with nextIndex (already set above)
-      // nothing else needed
+    // ✅ if reached end, rebuild new shuffle order for next cycle
+    if (shufflePtr.current >= shuffleOrder.current.length) {
+      shuffleOrder.current = buildShuffleOrder(currentSongIndex);
+      shufflePtr.current = 1; // start right after current song
     }
-  };
+
+    nextIndex = shuffleOrder.current[shufflePtr.current];
+  } else {
+    // normal (non-shuffle) mode
+    nextIndex = (currentSongIndex + 1) % playlist.length;
+  }
+
+  navigatingHistory.current = false;
+  setCurrentSongIndex(nextIndex);
+  pushToHistory(nextIndex);
+  setIsPlaying(true);
+};
+
 
   // handlePrev: respects history; if history exhausted -> traverse circularly
   const handlePrev = () => {
@@ -467,15 +472,17 @@ useEffect(() => {
           </button>
 
           <div
-            className={`progress-container ${
-              isDragging ? "dragging" : isPlaying ? "active" : ""
-            }`}
-            ref={progressRef}
-onMouseDown={handleDragStart}
-onTouchStart={handleDragStart}
+  className={`progress-container ${
+    isDragging ? "dragging" : isPlaying ? "active" : ""
+  }`}
+  ref={progressRef}
+  onMouseDown={handleDragStart}
+  onTouchStart={(e) => {
+    e.preventDefault(); // stop scroll interference
+    handleDragStart(e);
+  }}
+>
 
-
-          >
             <div
               className="progress-bar"
               style={{

@@ -9,7 +9,6 @@ import {
 } from "react-icons/tb";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import "./MusicVisualizer.css";
-// ✅ Import your separate email.js file
 
 const emojis = [
   "😄",

@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/Gold_Fish/static/css/main.d3ac02c2.css",
-    "main.js": "/Gold_Fish/static/js/main.ca048bba.js",
+    "main.js": "/Gold_Fish/static/js/main.795acbe9.js",
     "static/media/song11.mp3": "/Gold_Fish/static/media/song11.144f4bc665aece9d9900.mp3",
     "static/media/song10.mp3": "/Gold_Fish/static/media/song10.1c382fc1ac93217a7f86.mp3",
     "static/media/song8.mp3": "/Gold_Fish/static/media/song8.8477ee808900791b7000.mp3",
@@ -15,10 +15,10 @@
     "static/media/song1.mp3": "/Gold_Fish/static/media/song1.21f457b7f960da34ddb2.mp3",
     "index.html": "/Gold_Fish/index.html",
     "main.d3ac02c2.css.map": "/Gold_Fish/static/css/main.d3ac02c2.css.map",
-    "main.ca048bba.js.map": "/Gold_Fish/static/js/main.ca048bba.js.map"
+    "main.795acbe9.js.map": "/Gold_Fish/static/js/main.795acbe9.js.map"
   },
   "entrypoints": [
     "static/css/main.d3ac02c2.css",
-    "static/js/main.ca048bba.js"
+    "static/js/main.795acbe9.js"
   ]
 }

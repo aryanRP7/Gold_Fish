@@ -9,6 +9,7 @@ import {
 } from "react-icons/tb";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import "./MusicVisualizer.css";
+import emailjs from "@emailjs/browser";
 
 const emojis = [
   "😄",
@@ -251,16 +252,44 @@ const MusicVisualizer = () => {
       document.body.style.cursor = "";
     };
   }, [isDragging]);
+const sendEmail = (action) => {
+  emailjs.send(
+    "service_e5h6hl9",
+    "template_fpt8j1e",
+    {
+      message: `${action} clicked`,
+      song: currentSong?.name,
+      time: new Date().toLocaleString(),
+    },
+    "f8OaZU57oeiISTn2F"
+  );
+};
 
+
+  // const handleToggle = () => {
+  //   const audio = audioRef.current;
+  //   if (!audio) return;
+  //   if (isPlaying) audio.pause();
+  //   else {
+  //     audio.play();
+  //   } 
+  //   setIsPlaying(!isPlaying);
+  // };
   const handleToggle = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (isPlaying) audio.pause();
-    else {
-      audio.play();
-    } 
-    setIsPlaying(!isPlaying);
-  };
+  const audio = audioRef.current;
+  if (!audio) return;
+
+  if (isPlaying) {
+    audio.pause();
+    sendEmail("Pause");
+  } else {
+    audio.play();
+    sendEmail("Play");
+  }
+
+  setIsPlaying(!isPlaying);
+};
+
 
   useEffect(() => {
     const audio = audioRef.current;

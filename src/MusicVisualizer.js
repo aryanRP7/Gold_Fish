@@ -257,7 +257,7 @@ const sendEmail = (action) => {
     "service_e5h6hl9",
     "template_fpt8j1e",
     {
-      message: `${action} clicked`,
+             action: `${action} - ${currentSong?.name}`,
       song: currentSong?.name,
       time: new Date().toLocaleString(),
     },

@@ -483,144 +483,141 @@ const MusicVisualizer = () => {
   }, [currentSongIndex, isShuffle]);
 
   return (
-    <div className="page-wrapper">
-      <div className="scroll-buffer"></div>
-      <div className={`container ${isPlaying ? "stars" : "emoji-wall"}`}>
-        <audio ref={audioRef} src={currentSong.src} autoPlay={isPlaying} />
-        {!isPlaying && <div className="emoji-layer">{emojiElements}</div>}
-        {isPlaying && <canvas ref={canvasRef} className="star-canvas" />}
+    <div className={`container ${isPlaying ? "stars" : "emoji-wall"}`}>
+      <audio ref={audioRef} src={currentSong.src} autoPlay={isPlaying} />
+      {!isPlaying && <div className="emoji-layer">{emojiElements}</div>}
+      {isPlaying && <canvas ref={canvasRef} className="star-canvas" />}
 
-        <button
-          className="music-button"
-          onClick={(e) => {
-            handleToggle();
-            flashButton(e);
-          }}
-        >
-          {isPlaying ? <FaPause /> : <FaPlay />}
-        </button>
+      <button
+        className="music-button"
+        onClick={(e) => {
+          handleToggle();
+          flashButton(e);
+        }}
+      >
+        {isPlaying ? <FaPause /> : <FaPlay />}
+      </button>
 
-        {isPlaying && (
-          <>
-            <button
-              className="skip-button prev"
-              onClick={(e) => {
-                handlePrev();
-                flashButton(e);
-              }}
-            >
-              <IoIosArrowBack />
-            </button>
-            <button
-              className="skip-button next"
-              onClick={(e) => {
-                handleNext();
-                flashButton(e);
-              }}
-            >
-              <IoIosArrowForward />
-            </button>
+      {isPlaying && (
+        <>
+          <button
+            className="skip-button prev"
+            onClick={(e) => {
+              handlePrev();
+              flashButton(e);
+            }}
+          >
+            <IoIosArrowBack />
+          </button>
+          <button
+            className="skip-button next"
+            onClick={(e) => {
+              handleNext();
+              flashButton(e);
+            }}
+          >
+            <IoIosArrowForward />
+          </button>
 
+          <div
+            className={`progress-container ${
+              isDragging ? "dragging" : isPlaying ? "active" : ""
+            }`}
+            ref={progressRef}
+            onMouseDown={handleDragStart}
+            onTouchStart={(e) => {
+              e.preventDefault(); // stop scroll interference
+              handleDragStart(e);
+            }}
+          >
             <div
-              className={`progress-container ${
-                isDragging ? "dragging" : isPlaying ? "active" : ""
-              }`}
-              ref={progressRef}
-              onMouseDown={handleDragStart}
-              onTouchStart={(e) => {
-                e.preventDefault(); // stop scroll interference
-                handleDragStart(e);
+              className="progress-bar"
+              style={{
+                width: duration ? `${(currentTime / duration) * 100}%` : "0%",
+              }}
+            />
+          </div>
+
+          <div className="time-info">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+
+          <div className="seek-controls">
+            <button
+              className="seek-button"
+              onClick={(e) => {
+                handleRewind();
+                flashButton(e);
               }}
             >
-              <div
-                className="progress-bar"
-                style={{
-                  width: duration ? `${(currentTime / duration) * 100}%` : "0%",
-                }}
-              />
-            </div>
+              <TbRewindBackward10 />
+            </button>
+            <button
+              className="seek-button"
+              onClick={(e) => {
+                handleForward();
+                flashButton(e);
+              }}
+            >
+              <TbRewindForward30 />
+            </button>
+          </div>
 
-            <div className="time-info">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
+          <div className="song-dropdown">
+            <select
+              value={currentSongIndex}
+              onChange={(e) => handleSongChange(Number(e.target.value))}
+            >
+              {playlist.map((song, i) => (
+                <option key={i} value={i}>
+                  {song.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <div className="seek-controls">
-              <button
-                className="seek-button"
-                onClick={(e) => {
-                  handleRewind();
-                  flashButton(e);
-                }}
-              >
-                <TbRewindBackward10 />
-              </button>
-              <button
-                className="seek-button"
-                onClick={(e) => {
-                  handleForward();
-                  flashButton(e);
-                }}
-              >
-                <TbRewindForward30 />
-              </button>
-            </div>
+          <div className="shuffle-button">
+            <button
+              onClick={handleShuffleToggle}
+              className={`shuffle-icon ${isShuffle ? "active" : ""}`}
+            >
+              <TbArrowsShuffle />
+            </button>
+          </div>
+          {showSongList && (
+            <div
+              className="songlist-backdrop"
+              onClick={() => setShowSongList(false)}
+            ></div>
+          )}
 
-            <div className="song-dropdown">
-              <select
-                value={currentSongIndex}
-                onChange={(e) => handleSongChange(Number(e.target.value))}
-              >
-                {playlist.map((song, i) => (
-                  <option key={i} value={i}>
-                    {song.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="songlist-button">
+            <button
+              className="list-icon"
+              onClick={() => setShowSongList(!showSongList)}
+            >
+              <MdPlaylistPlay />
+            </button>
 
-            <div className="shuffle-button">
-              <button
-                onClick={handleShuffleToggle}
-                className={`shuffle-icon ${isShuffle ? "active" : ""}`}
-              >
-                <TbArrowsShuffle />
-              </button>
-            </div>
             {showSongList && (
-              <div
-                className="songlist-backdrop"
-                onClick={() => setShowSongList(false)}
-              ></div>
-            )}
-
-            <div className="songlist-button">
-              <button
-                className="list-icon"
-                onClick={() => setShowSongList(!showSongList)}
-              >
-                <MdPlaylistPlay />
-              </button>
-
-              {showSongList && (
-                <div className="songlist-overlay">
-                  <div className="songlist-panel">
-                    <ul>
-                      {currentSong.tracks?.length ? (
-                        currentSong.tracks.map((song, i) => (
-                          <li key={i}>{song}</li>
-                        ))
-                      ) : (
-                        <li>No track info available</li>
-                      )}
-                    </ul>
-                  </div>
+              <div className="songlist-overlay">
+                <div className="songlist-panel">
+                  <ul>
+                    {currentSong.tracks?.length ? (
+                      currentSong.tracks.map((song, i) => (
+                        <li key={i}>{song}</li>
+                      ))
+                    ) : (
+                      <li>No track info available</li>
+                    )}
+                  </ul>
                 </div>
-              )}
-            </div>
-          </>
-        )}
-      </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };

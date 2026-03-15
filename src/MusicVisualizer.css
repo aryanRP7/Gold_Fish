@@ -8,19 +8,18 @@ body {
   overscroll-behavior-y: contain;
 }
 
-.page-wrapper{
-  min-height:100dvh;
-  background:#000;
+body::after {
+  content: "";
+  display: block;
+  height: 60px;
 }
 
-.scroll-buffer{
-  height:40px;   /* adjust 30–80px if needed */
-}
+
 
 /* Container */
 .container {
   width: 100vw;
- height:calc(100dvh - 40px);
+  height: 100dvh;
   overflow: hidden;
   position: relative;
   font-family: "Segoe UI", sans-serif;

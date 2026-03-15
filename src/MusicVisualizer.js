@@ -403,9 +403,19 @@ const MusicVisualizer = () => {
     }
 
     navigatingHistory.current = false;
-    setCurrentSongIndex(nextIndex);
-    pushToHistory(nextIndex);
-    setIsPlaying(true);
+    const audio = audioRef.current;
+
+setCurrentSongIndex(nextIndex);
+pushToHistory(nextIndex);
+
+setTimeout(() => {
+  if (audio) {
+    audio.src = playlist[nextIndex].src;
+    audio.play().catch(() => {});
+  }
+}, 0);
+
+setIsPlaying(true);
   };
 
   // handlePrev: respects history; if history exhausted -> traverse circularly
@@ -505,10 +515,24 @@ const MusicVisualizer = () => {
       if (pos !== -1) shufflePtr.current = pos;
     }
   }, [currentSongIndex, isShuffle]);
+  useEffect(() => {
+  const audio = audioRef.current;
+  if (!audio) return;
+
+  if (isPlaying) {
+    audio.play().catch(() => {});
+  }
+}, [currentSongIndex]);
 
   return (
     <div className={`container ${isPlaying ? "stars" : "emoji-wall"}`}>
-      <audio ref={audioRef} src={currentSong.src} autoPlay={isPlaying} playsInline />
+<audio
+  ref={audioRef}
+  src={currentSong.src}
+  autoPlay
+  playsInline
+  preload="auto"
+/>
       {!isPlaying && <div className="emoji-layer">{emojiElements}</div>}
       {isPlaying && <canvas ref={canvasRef} className="star-canvas" />}
 

@@ -69,6 +69,14 @@ const MusicVisualizer = () => {
   const shufflePtr = useRef(0); // index inside shuffleOrder pointing to the currentSongIndex
 
   const currentSong = playlist[currentSongIndex];
+  useEffect(() => {
+  if ("mediaSession" in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentSong.name,
+      artist: "GoldFish",
+    });
+  }
+}, [currentSong]);
 
   const pushToHistory = (idx) => {
     if (navigatingHistory.current) return;
@@ -484,7 +492,7 @@ const MusicVisualizer = () => {
 
   return (
     <div className={`container ${isPlaying ? "stars" : "emoji-wall"}`}>
-      <audio ref={audioRef} src={currentSong.src} autoPlay={isPlaying} />
+      <audio ref={audioRef} src={currentSong.src} autoPlay={isPlaying} playsInline />
       {!isPlaying && <div className="emoji-layer">{emojiElements}</div>}
       {isPlaying && <canvas ref={canvasRef} className="star-canvas" />}
 

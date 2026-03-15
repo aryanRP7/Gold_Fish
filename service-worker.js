@@ -1,4 +1,4 @@
-const CACHE_NAME = "goldfish-cache-v1";
+const CACHE_NAME = "goldfish-cache-v2";
 
 const urlsToCache = [
   "/",

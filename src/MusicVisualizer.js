@@ -70,13 +70,29 @@ const MusicVisualizer = () => {
 
   const currentSong = playlist[currentSongIndex];
   useEffect(() => {
-  if ("mediaSession" in navigator) {
+  if ("mediaSession" in navigator && currentSong) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: currentSong.name,
       artist: "GoldFish",
+      artwork: [
+        {
+          src: "/icon-192.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+        {
+          src: "/icon-512.png",
+          sizes: "512x512",
+          type: "image/png",
+        }
+      ],
     });
+
+    // optional but recommended for lockscreen controls
+    navigator.mediaSession.setActionHandler("nexttrack", handleNext);
+    navigator.mediaSession.setActionHandler("previoustrack", handlePrev);
   }
-}, [currentSong]);
+}, [currentSongIndex]);
 
   const pushToHistory = (idx) => {
     if (navigatingHistory.current) return;

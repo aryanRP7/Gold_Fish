@@ -2,11 +2,10 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;   /* 🔑 stops page scrolling */
-  background: black;  /* fallback so white never appears */
+  background: black; /* same as your app background */
 }
 body {
-  overscroll-behavior: none;
+  overscroll-behavior-y: contain;
 }
 
 
@@ -21,7 +20,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-    touch-action: none;   /* 🔑 prevents mobile scroll gestures */
 }
 
 /* Music Button */

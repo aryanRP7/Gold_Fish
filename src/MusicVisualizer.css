@@ -372,3 +372,96 @@
 .progress-container.dragging {
   cursor: grabbing !important;
 }
+
+
+
+/* Anchor for button + popup */
+
+.songlist-button{
+  position:absolute;
+  top:calc(50% + 6.5rem);  /* lowered slightly */
+  left:calc(50% + 10.5rem);
+  transform:translateY(-50%);
+  z-index:10;
+}
+
+/* Menu icon */
+.list-icon{
+  font-size:1.6rem;
+  border:none;
+  background:none;
+  color:rgba(240,240,240,0.35);
+  cursor:pointer;
+  transition:transform 0.2s ease,color 0.2s ease;
+}
+
+.list-icon:hover{
+  transform:scale(1.08);
+  color:rgba(255,255,255,0.65);
+}
+
+/* invisible background click catcher */
+.songlist-backdrop{
+  position:fixed;
+  inset:0;
+  background:transparent;
+  z-index:50;
+}
+
+/* popup wrapper */
+.songlist-overlay{
+  position:absolute;
+  bottom:140%;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:60;
+}
+
+/* glass panel */
+
+.songlist-panel{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(2px);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;
+  padding:10px 12px;
+
+  width:max-content;
+  /* min-width:120px; */
+
+  color:white;
+  box-shadow:0 6px 20px rgba(0,0,0,0.35);
+}
+
+/* title */
+.songlist-panel h3{
+  font-size:0.9rem;
+  margin-bottom:8px;
+  color:rgba(255,255,255,0.85);
+}
+
+/* list */
+.songlist-panel ul{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+.songlist-panel li{
+  font-size:0.85rem;
+  padding:3px 0;
+  color:rgba(255,255,255,0.8);
+}
+
+
+/* Mobile layout */
+@media (max-width:768px){
+
+  .songlist-button{
+    top:calc(50% + 9.5rem);   /* same vertical line as shuffle on mobile */
+    right:18%;                /* position relative to shuffle */
+    left:auto;
+    transform:translateY(-50%);
+  }
+
+}

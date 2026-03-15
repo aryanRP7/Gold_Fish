@@ -7,6 +7,7 @@ import {
   TbRewindForward30,
   TbArrowsShuffle,
 } from "react-icons/tb";
+import { MdPlaylistPlay } from "react-icons/md";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import "./MusicVisualizer.css";
 import emailjs from "@emailjs/browser";
@@ -46,6 +47,7 @@ const MusicVisualizer = () => {
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
+  const [showSongList, setShowSongList] = useState(false);
 
   const [isShuffle, setIsShuffle] = useState(false);
   const [shuffledQueue, setShuffledQueue] = useState([]); // kept for compatibility, but not required
@@ -252,19 +254,18 @@ const MusicVisualizer = () => {
       document.body.style.cursor = "";
     };
   }, [isDragging]);
-const sendEmail = (action) => {
-  emailjs.send(
-    "service_e5h6hl9",
-    "template_fpt8j1e",
-    {
-             action: `${action} - ${currentSong?.name}`,
-      song: currentSong?.name,
-      time: new Date().toLocaleString(),
-    },
-    "f8OaZU57oeiISTn2F"
-  );
-};
-
+  const sendEmail = (action) => {
+    emailjs.send(
+      "service_e5h6hl9",
+      "template_fpt8j1e",
+      {
+        action: `${action} - ${currentSong?.name}`,
+        song: currentSong?.name,
+        time: new Date().toLocaleString(),
+      },
+      "f8OaZU57oeiISTn2F",
+    );
+  };
 
   // const handleToggle = () => {
   //   const audio = audioRef.current;
@@ -272,24 +273,23 @@ const sendEmail = (action) => {
   //   if (isPlaying) audio.pause();
   //   else {
   //     audio.play();
-  //   } 
+  //   }
   //   setIsPlaying(!isPlaying);
   // };
   const handleToggle = () => {
-  const audio = audioRef.current;
-  if (!audio) return;
+    const audio = audioRef.current;
+    if (!audio) return;
 
-  if (isPlaying) {
-    audio.pause();
-    sendEmail("Pause");
-  } else {
-    audio.play();
-    sendEmail("Play");
-  }
+    if (isPlaying) {
+      audio.pause();
+      sendEmail("Pause");
+    } else {
+      audio.play();
+      sendEmail("Play");
+    }
 
-  setIsPlaying(!isPlaying);
-};
-
+    setIsPlaying(!isPlaying);
+  };
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -585,6 +585,38 @@ const sendEmail = (action) => {
               <TbArrowsShuffle />
             </button>
           </div>
+         {showSongList && (
+  <div
+    className="songlist-backdrop"
+    onClick={() => setShowSongList(false)}
+  ></div>
+)}
+
+<div className="songlist-button">
+  <button
+    className="list-icon"
+    onClick={() => setShowSongList(!showSongList)}
+  >
+    <MdPlaylistPlay />
+  </button>
+
+  {showSongList && (
+    <div className="songlist-overlay">
+      <div className="songlist-panel">
+
+        <ul>
+          {currentSong.tracks?.length ? (
+            currentSong.tracks.map((song, i) => (
+              <li key={i}>{song}</li>
+            ))
+          ) : (
+            <li>No track info available</li>
+          )}
+        </ul>
+      </div>
+    </div>
+  )}
+</div>
         </>
       )}
     </div>

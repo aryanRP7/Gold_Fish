@@ -1,13 +1,27 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;   /* 🔑 stops page scrolling */
+  background: black;  /* fallback so white never appears */
+}
+body {
+  overscroll-behavior: none;
+}
+
+
+
 /* Container */
 .container {
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   position: relative;
   font-family: "Segoe UI", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
+    touch-action: none;   /* 🔑 prevents mobile scroll gestures */
 }
 
 /* Music Button */

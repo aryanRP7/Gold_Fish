@@ -108,48 +108,10 @@ body {
   text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
 }
 
-/* Emoji‑Wall Background + Sparkle */
 .emoji-wall {
-  background: linear-gradient(
-    270deg,
-    #1a101f,
-    #331414,
-    #2c1b0f,
-    #0b0b0b,
-    #2d0d3a,
-    #150c14,
-    #1a101f
-  );
-  background-size: 1200% 1200%;
-  animation: waveGradient 60s ease infinite;
+  background: #000;
   position: relative;
-  transition: background 2s ease;
-}
-@keyframes waveGradient {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-.emoji-wall::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-      circle at 30% 70%,
-      rgba(255, 255, 255, 0.05),
-      transparent 70%
-    ),
-    radial-gradient(
-      circle at 70% 30%,
-      rgba(255, 255, 255, 0.03),
-      transparent 60%
-    );
-  pointer-events: none;
-  z-index: 1;
+  overflow: hidden;
 }
 
 /* Floating Emojis */
@@ -204,11 +166,22 @@ body {
 .progress-container:hover {
   opacity: 1;
 }
-.progress-bar {
+/* .progress-bar {
   height: 100%;
   background: rgba(255, 255, 255, 0.6);
   border-radius: 3px;
   transition: width 0.2s ease;
+} */
+ .progress-bar {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+/* Disable animation while scrubbing */
+.progress-container.dragging .progress-bar {
+  transition: none;
 }
 
 /* Time Info */

@@ -70,29 +70,29 @@ const MusicVisualizer = () => {
 
   const currentSong = playlist[currentSongIndex];
   useEffect(() => {
-  if ("mediaSession" in navigator && currentSong) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: currentSong.name,
-      artist: "GoldFish",
-      artwork: [
-        {
- src: "/Gold_Fish/icon-192.png",
-          sizes: "192x192",
-          type: "image/png",
-        },
-        {
-    src: "/Gold_Fish/icon-512.png",
-          sizes: "512x512",
-          type: "image/png",
-        }
-      ],
-    });
+    if ("mediaSession" in navigator && currentSong) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentSong.name,
+        artist: "GoldFish",
+        artwork: [
+          {
+            src: "/Gold_Fish/icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "/Gold_Fish/icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      });
 
-    // optional but recommended for lockscreen controls
-    navigator.mediaSession.setActionHandler("nexttrack", handleNext);
-    navigator.mediaSession.setActionHandler("previoustrack", handlePrev);
-  }
-}, [currentSongIndex]);
+      // optional but recommended for lockscreen controls
+      navigator.mediaSession.setActionHandler("nexttrack", handleNext);
+      navigator.mediaSession.setActionHandler("previoustrack", handlePrev);
+    }
+  }, [currentSongIndex]);
 
   const pushToHistory = (idx) => {
     if (navigatingHistory.current) return;
@@ -156,9 +156,12 @@ const MusicVisualizer = () => {
   }, []);
 
   const initStars = useCallback(() => {
-    const w = window.innerWidth,
-      h = window.innerHeight;
-    stars.current = Array.from({ length: 800 }, () => ({
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    const starCount = w < 768 ? 300 : 800; // 👈 moved inside
+
+    stars.current = Array.from({ length: starCount }, () => ({
       x: (Math.random() - 0.5) * w,
       y: (Math.random() - 0.5) * h,
       z: Math.random() * w,
@@ -178,7 +181,7 @@ const MusicVisualizer = () => {
     ctx.fillRect(0, 0, w, h);
 
     for (const star of stars.current) {
-      star.z -= 2;
+      star.z -= window.innerWidth < 768 ? 1.2 : 2;
       if (star.z <= 0) {
         star.z = w;
         star.x = (Math.random() - 0.5) * w;
@@ -405,17 +408,17 @@ const MusicVisualizer = () => {
     navigatingHistory.current = false;
     const audio = audioRef.current;
 
-setCurrentSongIndex(nextIndex);
-pushToHistory(nextIndex);
+    setCurrentSongIndex(nextIndex);
+    pushToHistory(nextIndex);
 
-setTimeout(() => {
-  if (audio) {
-    audio.src = playlist[nextIndex].src;
-    audio.play().catch(() => {});
-  }
-}, 0);
+    setTimeout(() => {
+      if (audio) {
+        audio.src = playlist[nextIndex].src;
+        audio.play().catch(() => {});
+      }
+    }, 0);
 
-setIsPlaying(true);
+    setIsPlaying(true);
   };
 
   // handlePrev: respects history; if history exhausted -> traverse circularly
@@ -516,23 +519,23 @@ setIsPlaying(true);
     }
   }, [currentSongIndex, isShuffle]);
   useEffect(() => {
-  const audio = audioRef.current;
-  if (!audio) return;
+    const audio = audioRef.current;
+    if (!audio) return;
 
-  if (isPlaying) {
-    audio.play().catch(() => {});
-  }
-}, [currentSongIndex]);
+    if (isPlaying) {
+      audio.play().catch(() => {});
+    }
+  }, [currentSongIndex]);
 
   return (
     <div className={`container ${isPlaying ? "stars" : "emoji-wall"}`}>
-<audio
-  ref={audioRef}
-  src={currentSong.src}
-  autoPlay
-  playsInline
-  preload="auto"
-/>
+      <audio
+        ref={audioRef}
+        src={currentSong.src}
+        autoPlay
+        playsInline
+        preload="auto"
+      />
       {!isPlaying && <div className="emoji-layer">{emojiElements}</div>}
       {isPlaying && <canvas ref={canvasRef} className="star-canvas" />}
 

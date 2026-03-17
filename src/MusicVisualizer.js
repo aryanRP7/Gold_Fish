@@ -581,12 +581,13 @@ const MusicVisualizer = () => {
               handleDragStart(e);
             }}
           >
-            <div
-              className="progress-bar"
-              style={{
-                width: duration ? `${(currentTime / duration) * 100}%` : "0%",
-              }}
-            />
+<div
+  className="progress-bar"
+  style={{
+    width: duration ? `${(currentTime / duration) * 100}%` : "0%",
+    transition: isDragging ? "none" : "width 0.2s linear",
+  }}
+/>
           </div>
 
           <div className="time-info">

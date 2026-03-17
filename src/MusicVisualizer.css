@@ -180,9 +180,9 @@ body {
 }
 
 /* Disable animation while scrubbing */
-.progress-container.dragging .progress-bar {
+/* .progress-container.dragging .progress-bar {
   transition: none;
-}
+} */
 
 /* Time Info */
 .time-info {

@@ -10,6 +10,7 @@ import song9 from "./assets/song9.mp3";
 import song10 from "./assets/song10.mp3";
 import song11 from "./assets/song11.mp3";
 import song12 from "./assets/song12.mp3";
+import song13 from "./assets/song13.mp3";
 
 export const playlist = [
   {
@@ -166,6 +167,19 @@ export const playlist = [
       "Pal",
       "Bin Tere",
       "Tera Rastaa",
+    ],
+  },
+  {
+    name: "Tum Se Hi",
+    src: song13,
+    tracks: [
+      "Meherbani",
+      "Hangover",
+      "Tum Se Hi",
+      "Hua Hai Aaj",
+      "Abhi Abhi",
+      "Jab Tak Hai Jaan",
+      "Tune Jo Na Kaha",
     ],
   },
 ];
